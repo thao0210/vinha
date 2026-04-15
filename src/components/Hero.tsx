@@ -14,28 +14,16 @@ export default function Hero({ lang }: { lang: Locale }) {
   const t = LANG[lang].hero;
 
   const [current, setCurrent] = useState(0);
-  const [fading, setFading] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setFading(true);
-      setTimeout(() => {
-        setCurrent((prev) => (prev + 1) % FOOD_SLIDES.length);
-        setFading(false);
-      }, 2000); // fade-out duration
+      setCurrent((prev) => (prev + 1) % FOOD_SLIDES.length);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
 
-  const slide = FOOD_SLIDES[current];
-
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#FFF0E5]">
-      {/* Decorative blobs */}
-      {/* <div className="absolute top-32 right-[8%] w-[480px] h-[480px] rounded-full bg-[#FDDCCA]/60 blur-sm" /> */}
-      {/* <div className="absolute bottom-[-40px] left-[30%] w-56 h-56 rounded-full bg-red-700/5" /> */}
-      {/* <div className="absolute top-[60%] right-[35%] w-20 h-20 rounded-full bg-orange-400/15" /> */}
-
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 min-h-screen flex items-center">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full pt-24 pb-16">
 
@@ -64,10 +52,6 @@ export default function Hero({ lang }: { lang: Locale }) {
 
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4">
-              {/*
-                Nút CTA chính: gradient cam → đỏ, khác hẳn nút đỏ trơn trên navbar.
-                Mũi tên có animation bounce-x khi hover.
-              */}
               <button
                 className="
                   group relative inline-flex items-center gap-2.5
@@ -81,7 +65,6 @@ export default function Hero({ lang }: { lang: Locale }) {
                   background: "linear-gradient(135deg, #ff6b2b 0%, #c0152a 100%)",
                 }}
               >
-                {/* Shine overlay on hover */}
                 <span
                   className="
                     absolute inset-0 opacity-0 group-hover:opacity-100
@@ -97,7 +80,6 @@ export default function Hero({ lang }: { lang: Locale }) {
                 />
               </button>
 
-              {/* Nút phụ: xem menu */}
               <button className="inline-flex items-center gap-3 text-gray-700 font-semibold text-[15px] hover:text-red-700 transition-colors">
                 <span className="w-12 h-12 rounded-full bg-white shadow-lg shadow-gray-200/50 flex items-center justify-center">
                   <span className="w-0 h-0 border-t-[6px] border-b-[6px] border-l-[10px] border-transparent border-l-red-700 ml-1" />
@@ -113,50 +95,58 @@ export default function Hero({ lang }: { lang: Locale }) {
               {/* Background circle */}
               <div className="absolute inset-0 rounded-full bg-[#FDDCCA] shadow-2xl shadow-orange-200/50" />
 
-              {/* Food image — cross-fade khi đổi slide */}
-              <img
-                key={slide.src}
-                src={slide.src}
-                alt="Vị Nhà"
-                className="relative z-10 w-full h-full object-cover rounded-full"
-                style={{
-                  transition: "opacity 0.4s ease",
-                  opacity: fading ? 0 : 1,
-                }}
-              />
+              {/*
+                Cross-fade slideshow:
+                Render tất cả ảnh chồng lên nhau (absolute).
+                Ảnh active → opacity 1, còn lại → opacity 0.
+                CSS transition tự xử lý smooth fade giữa 2 ảnh.
+                Không cần unmount/remount → không bị khoảng trắng.
+              */}
+              {FOOD_SLIDES.map((slide, i) => (
+                <img
+                  key={slide.src}
+                  src={slide.src}
+                  alt="Vị Nhà"
+                  className="absolute inset-0 z-10 w-full h-full object-cover rounded-full"
+                  style={{
+                    opacity: i === current ? 1 : 0,
+                    transition: "opacity 0.8s ease-in-out",
+                  }}
+                />
+              ))}
 
-              {/* Discount badge — animate khi đổi */}
-              <div
-                className="
-                  absolute -top-[-20px] -right-0 z-20
-                  w-25 h-25 rounded-full
-                  flex flex-col items-center justify-center
-                  shadow-lg shadow-red-700/30
-                  border-4 border-[#FFF0E5]
-                "
-                style={{
-                  background: "linear-gradient(135deg, #ff8c42 0%, #e8321a 100%)",
-                  transition: "opacity 0.4s ease",
-                  opacity: fading ? 0 : 1,
-                }}
-              >
-                <span className="text-white font-extrabold text-xl leading-none">
-                  {slide.badge}
-                </span>
-                <span className="text-white/75 text-[14px] font-semibold">
-                  {slide.badgeSub}
-                </span>
-              </div>
+              {/* Discount badge — cross-fade cùng với ảnh */}
+              {FOOD_SLIDES.map((slide, i) => (
+                <div
+                  key={slide.src + "-badge"}
+                  className="
+                    absolute -top-[-20px] -right-0 z-20
+                    w-25 h-25 rounded-full
+                    flex flex-col items-center justify-center
+                    shadow-lg shadow-red-700/30
+                    border-4 border-[#FFF0E5]
+                  "
+                  style={{
+                    background: "linear-gradient(135deg, #ff8c42 0%, #e8321a 100%)",
+                    opacity: i === current ? 1 : 0,
+                    transition: "opacity 0.8s ease-in-out",
+                  }}
+                >
+                  <span className="text-white font-extrabold text-xl leading-none">
+                    {slide.badge}
+                  </span>
+                  <span className="text-white/75 text-[14px] font-semibold">
+                    {slide.badgeSub}
+                  </span>
+                </div>
+              ))}
 
               {/* Dot indicators */}
               <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-30">
                 {FOOD_SLIDES.map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => {
-                      setFading(true);
-                      setTimeout(() => { setCurrent(i); setFading(false); }, 400);
-                    }}
+                    onClick={() => setCurrent(i)}
                     className={`
                       rounded-full transition-all duration-300
                       ${i === current
@@ -166,10 +156,6 @@ export default function Hero({ lang }: { lang: Locale }) {
                   />
                 ))}
               </div>
-
-              {/* Decorative blobs */}
-              {/* <div className="absolute -bottom-4 left-8 w-14 h-14 rounded-full bg-orange-400/40" />
-              <div className="absolute top-10 -left-6 w-8 h-8 rounded-full bg-red-700/20" /> */}
             </div>
 
             {/* Info card floating */}
