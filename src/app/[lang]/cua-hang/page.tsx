@@ -27,7 +27,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
         href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet"
       />
-      <Navbar lang={lang} onLangChange={handleLangChange}/>
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light"/>
 
       {/* ── Hero ── */}
       <section className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">

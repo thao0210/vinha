@@ -17,9 +17,9 @@ export default function HomePage() {
     <main className="antialiased">
       <Navbar lang={lang} onLangChange={setLang} />
       <Hero lang={lang} />
-      <PromoSection lang={lang} />
       <MenuSection lang={lang} />
       <WhyUs lang={lang} />
+      <PromoSection lang={lang} />
       <StoreList lang={lang} />
       <CTABanner lang={lang} />
       <Footer lang={lang} />

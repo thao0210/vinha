@@ -39,7 +39,7 @@ export default function GioiThieuPage({ params }: { params: Promise<{ lang: Loca
         href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet"
       />
-      <Navbar lang={lang} onLangChange={handleLangChange} />
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" />
 
       {/* ── Hero ── */}
       <section className="relative bg-[#FFF0E5] pt-28 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">

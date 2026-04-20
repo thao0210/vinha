@@ -10,7 +10,7 @@ export default function WhyUs({ lang }: { lang: Locale }) {
   const t = LANG[lang].why;
 
   return (
-    <section id="about" className="py-24 bg-[#FFF0E5] border-t border-orange-200">
+    <section id="about" className="py-14 bg-[#FFF0E5] border-t border-orange-200">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Header */}
         <div className="text-center mb-14">

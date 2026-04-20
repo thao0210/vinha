@@ -1,6 +1,6 @@
 "use client";
 import { use, useState } from "react";
-import { ArrowRight, Flame, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Flame, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LANG, Locale } from "@/lib/lang";
@@ -14,7 +14,6 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
   const pathname = usePathname();
 
   const handleLangChange = (newLang: Locale) => {
-    // /vi/menu → /en/menu
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
     router.push(newPath);
   };
@@ -46,31 +45,22 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
   };
 
   return (
-    <div
-      className="min-h-screen bg-[#FFF5EE]"
-      style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}
-    >
-      <link
-        href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-      />
-      <Navbar lang={lang} onLangChange={handleLangChange} />
+    <div className="min-h-screen bg-orange-50">
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" />
 
       {/* ── Hero ── */}
-      <section className="pt-28 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-        {/* Tag — khớp với MenuSection */}
-        <span className="text-sm font-bold text-red-700 tracking-widest uppercase">
-          {t.badgeLabel}
+      <section className="pt-32 pb-12 px-6 lg:px-10 max-w-7xl mx-auto text-center">
+        <span className="inline-block text-xs font-black tracking-[0.2em] uppercase text-orange-400 mb-3">
+          ✦ Thực đơn
         </span>
-        {/* Heading — khớp với MenuSection */}
-        <h1 className="text-4xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mt-3 mb-4">
+        <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight mt-2 mb-4">
           {t.title}
         </h1>
-        <p className="text-gray-500 text-lg max-w-xl mx-auto">{t.subtitle}</p>
+        <p className="text-gray-400 text-lg max-w-xl mx-auto">{t.subtitle}</p>
       </section>
 
-      {/* ── Tab filter — căn giữa, bo tròn, shadow khớp MenuSection ── */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-16">
+      {/* ── Tabs ── */}
+      <section className="px-6 lg:px-10 max-w-7xl mx-auto mb-12">
         <div className="flex flex-wrap justify-center gap-3">
           {tabs.map((tab) => (
             <button
@@ -78,8 +68,8 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
               onClick={() => setActiveTab(tab.key)}
               className={`text-sm font-semibold px-6 py-2.5 rounded-full transition-all ${
                 activeTab === tab.key
-                  ? "bg-red-700 text-white shadow-lg shadow-red-700/20"
-                  : "bg-white text-gray-500 hover:text-red-700 hover:shadow-md"
+                  ? "bg-orange-500 text-white shadow-lg shadow-orange-500/20"
+                  : "bg-white/10 text-gray-500 hover:text-gray-800 hover:bg-white/15"
               }`}
             >
               {tab.label}
@@ -88,47 +78,51 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
         </div>
       </section>
 
-      {/* ── Grid — card khớp với MenuSection ── */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-24">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-16 justify-items-center">
+      {/* ── Grid ── */}
+      <section className="px-6 lg:px-10 max-w-7xl mx-auto pb-28">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
           {filtered.map((item) => (
-            <div
+            <a
               key={item.id}
-              className="group relative w-full max-w-[260px] flex flex-col items-center"
+              href={`/${lang}/menu-details?slug=${item.id}`}
+              className="group cursor-pointer"
             >
-              {/* Ảnh tròn nổi lên — khớp MenuSection */}
-              <div className="relative z-10 w-[72%] aspect-square rounded-full ring-4 ring-orange-300 bg-white shadow-lg group-hover:scale-105 transition-transform duration-300 mb-[-44%] overflow-hidden flex-shrink-0">
+              {/* Image */}
+              <div className="relative aspect-square rounded-2xl overflow-hidden mb-4 shadow-lg shadow-black/40">
                 <img
                   src={item.img}
                   alt={item.name}
-                  className="absolute inset-0 w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-              </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
 
-              {/* Card body — bg cam nhạt + border, khớp MenuSection */}
-              <div className="relative w-full bg-orange-200 border-2 border-orange-300 rounded-3xl pt-[50%] pb-5 px-4 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-red-200 shadow-md">
-                {/* Tag badge */}
+                {/* Tag */}
                 {item.tag && (
-                  <span
-                    className={`absolute top-3 right-3 z-20 flex items-center gap-1 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-white/30 ${tagStyle[item.tag]}`}
-                  >
+                  <span className={`absolute top-3 left-3 flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-1 rounded-full ${tagStyle[item.tag]}`}>
                     {tagIcon[item.tag]}
                     {tagLabel[item.tag]}
                   </span>
                 )}
 
-                <h3 className="text-base font-extrabold text-gray-900 mt-1 mb-3 leading-snug">
-                  {item.name}
-                </h3>
-                <p className="text-lg font-extrabold text-red-600">{item.price}</p>
-
-                <div className="mt-4 flex justify-center">
-                  <button className="flex items-center gap-1.5 bg-orange-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all">
-                    {t.order} <ArrowRight size={12} />
-                  </button>
+                {/* Hover CTA */}
+                <div className="absolute bottom-3 inset-x-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                  <div
+                    className="w-full flex items-center justify-center gap-1.5 text-white text-xs font-bold py-2.5 rounded-xl"
+                    style={{ background: "linear-gradient(135deg, #ff6b2b, #c0152a)" }}
+                  >
+                    Đặt ngay <ArrowRight size={12} />
+                  </div>
                 </div>
               </div>
-            </div>
+
+              {/* Info */}
+              <div className="px-1">
+                <h3 className="font-bold text-base mb-1 group-hover:text-orange-400 transition-colors">
+                  {item.name}
+                </h3>
+                <p className="text-orange-400 font-extrabold text-lg">{item.price}</p>
+              </div>
+            </a>
           ))}
         </div>
       </section>

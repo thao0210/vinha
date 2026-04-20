@@ -1,76 +1,67 @@
 "use client";
-import { Phone, Mail } from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
+import { Phone } from "lucide-react";
 import { LANG, Locale } from "@/lib/lang";
 
 export default function Footer({ lang }: { lang: Locale }) {
   const t = LANG[lang].footer;
-  const nav = LANG[lang].nav;
-  const stores = LANG[lang].stores;
 
   return (
-    <footer className="bg-[#4c2507] text-white/50 pt-20 pb-8">
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* Brand */}
+    <footer className="bg-[#702B14] text-white/80 pt-16 pb-10">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid md:grid-cols-2 gap-10">
+          {/* Left */}
           <div>
-            <div className="text-3xl font-extrabold text-white tracking-tight mb-4">
-              Vị Nhà
+            <div className="text-3xl font-bold text-white mb-6">VỊ NHÀ</div>
+
+            <div className="mb-4">
+              <div className="font-semibold text-white">Slogan:</div>
+              <div className="text-white/80">Cơm ngon chuẩn vị nhà.</div>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs mb-6">{t.desc}</p>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm">
-                <Phone size={15} className="text-red-400" /> 0909 123 456
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Mail size={15} className="text-red-400" /> hello@vinha.vn
+
+            <div className="flex items-center gap-2 mb-6">
+              <span className="font-semibold text-white">Hỗ trợ:</span>
+              <span>0909 123 456</span>
+            </div>
+
+            <div className="border-t border-white/20 my-6" />
+
+            <div>
+              <div className="font-semibold text-white mb-3">Theo dõi</div>
+              <div className="flex gap-4">
+                <a className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-[#6b3414] transition">
+                  <FaFacebookF size={16} />
+                </a>
+                <a className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-[#6b3414] transition">
+                  <FaInstagram size={16} />
+                </a>
+                <a className="px-3 h-10 rounded-full border border-white/30 flex items-center text-sm hover:bg-white hover:text-[#6b3414] transition">
+                  Zalo
+                </a>
               </div>
             </div>
           </div>
 
-          {/* Links */}
+          {/* Right */}
           <div>
-            <h4 className="text-xs font-bold tracking-[2px] uppercase text-white/25 mb-5">
-              {t.linksTitle}
-            </h4>
-            {nav.items.map((item, i) => (
-              <a key={i} href={`#${nav.ids[i]}`}
-                className="block text-sm py-1.5 hover:text-white transition-colors">
-                {item}
-              </a>
-            ))}
-          </div>
+            <div className="font-bold text-white text-lg mb-4">
+              BẾP CHÍNH
+            </div>
 
-          {/* Stores */}
-          <div>
-            <h4 className="text-xs font-bold tracking-[2px] uppercase text-white/25 mb-5">
-              {stores.tag}
-            </h4>
-            {stores.list.slice(0, 3).map((s, i) => (
-              <a key={i} href="#stores"
-                className="block text-sm py-1.5 hover:text-white transition-colors">
-                {s.name.split("—")[1]?.trim()}
-              </a>
-            ))}
-          </div>
+            <div className="mb-2">123 Lê Lợi, Quận 1</div>
+            <div className="mb-6">Phục vụ: 8:30 - 13:30</div>
 
-          {/* Social */}
-          <div>
-            <h4 className="text-xs font-bold tracking-[2px] uppercase text-white/25 mb-5">
-              {t.followTitle}
-            </h4>
-            <div className="flex gap-3">
-              <a href="#" className="w-11 h-11 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/40 hover:bg-red-700 hover:text-white hover:border-red-700 transition-all">
-                <FaFacebookF size={16} />
-              </a>
-              <a href="#" className="w-11 h-11 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white/40 hover:bg-red-700 hover:text-white hover:border-red-700 transition-all">
-                <FaInstagram size={16} />
-              </a>
+            <div className="flex gap-4 text-sm underline underline-offset-4">
+              <a href="#">Thực đơn</a>
+              <span>•</span>
+              <a href="#">Ưu đãi</a>
+              <span>•</span>
+              <a href="#">Chính sách</a>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-6 text-center text-xs">
+        <div className="text-center text-xs text-white/50 mt-10">
           {t.copy}
         </div>
       </div>
