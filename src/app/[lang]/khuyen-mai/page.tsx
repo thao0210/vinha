@@ -215,7 +215,7 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
   const t = LANG[lang].promoPage;
   const router = useRouter();
   const pathname = usePathname();
-  const items = t.items as PromoItem[];
+  const items = t.items as unknown as PromoItem[];
   const count = items.length;
 
   const handleLangChange = (newLang: Locale) => {
