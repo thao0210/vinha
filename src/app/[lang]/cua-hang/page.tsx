@@ -588,7 +588,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
     router.push(newPath);
   };
 
-  const branches = t.branches as Branch[];
+  const branches = t.branches as unknown as Branch[];
 
   // Featured = first branch; rest = others
   const featured = branches[0];
