@@ -560,7 +560,7 @@ export const LANG = {
       exploreTitle: "Explore",
       exploreLinks: [
         { label: "Menu",   href: "/en/menu"   },
-        { label: "Deals",  href: "/en/khuyen-mai"  },
+        { label: "Deals",  href: "/en/promo"  },
         { label: "Policy", href: "#"          },
       ],
       followTitle: "Follow us",
@@ -841,6 +841,7 @@ export const LANG = {
       filterOpen:        "Open Now",
       filterComing:      "Coming Soon",
       filterCity:        "HCMC",
+      mascotImg:         "/images/store-mascot.png",
       branches: [
         { id: 1, name: "Vị Nhà — District 1",  address: "123 Nguyen Hue, Ben Nghe Ward, District 1, HCMC",      hours: "10:00–14:00 · 17:00–20:00", phone: "028 1234 5678", status: "open"   as const, img: "/images/store-1.png" },
         { id: 2, name: "Vị Nhà — District 3",  address: "456 Vo Van Tan, Ward 5, District 3, HCMC",              hours: "10:00–14:00 · 17:00–20:00", phone: "028 2345 6789", status: "open"   as const, img: "/images/store-2.png" },
@@ -853,8 +854,8 @@ export const LANG = {
     aboutPage: {
       // Hero
       storyLabel:       "Vị Nhà Story",
-      heroTitleLine1:   "Kindness",
-      heroTitleBadge:   "in every",
+      heroTitleLine1:   "Kindness in",
+      heroTitleBadge:   "every",
       heroTitleLine2:   "Meal",
       heroImg:          "/images/about-banner.png",
       heroSubImg:       "/images/about-banner2.png",
