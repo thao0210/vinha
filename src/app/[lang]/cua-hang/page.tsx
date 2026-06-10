@@ -467,7 +467,7 @@ function MobileCarouselCard({ branch, t }: { branch: Branch; t: typeof LANG[Loca
                 cursor: "pointer",
               }}
             >
-              {t.detail ?? "Chi tiết"}
+              {t.orderNow}
             </button>
           ) : (
             <button
