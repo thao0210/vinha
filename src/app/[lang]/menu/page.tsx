@@ -384,7 +384,7 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
   const openModal = useCallback((item: MenuItem) => setSelectedItem(item), []);
   const closeModal = useCallback(() => setSelectedItem(null), []);
   const handleSelectPairing = useCallback((id: number) => {
-    const found = (t.items as MenuItem[]).find((i) => i.id === id);
+    const found = (t.items as unknown as MenuItem[]).find((i) => i.id === id);
     if (found) setSelectedItem(found);
   }, [t.items]);
 
@@ -398,8 +398,8 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
 
   const filtered: MenuItem[] =
     activeTab === "all"
-      ? (t.items as MenuItem[])
-      : (t.items as MenuItem[]).filter((item) => item.category === activeTab);
+      ? (t.items as unknown as MenuItem[])
+      : (t.items as unknown as MenuItem[]).filter((item) => item.category === activeTab);
 
   const tagStyle: Record<string, string> = {
     hot:     "bg-white text-[#8B1A1A]",
@@ -485,7 +485,7 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
         <div className="grid grid-cols-2 gap-4 lg:gap-6">
           {/* Large card — left, fixed 510px */}
           <button
-            onClick={() => openModal(t.items.find((i) => i.id === featA.id) as MenuItem)}
+            onClick={() => openModal(t.items.find((i) => i.id === featA.id) as unknown as MenuItem)}
             className="group relative rounded-2xl overflow-hidden cursor-pointer text-left"
             style={{ height: "510px" }}
           >
@@ -510,7 +510,7 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
             {[featB, featC].map((feat) => (
               <button
                 key={feat.id}
-                onClick={() => openModal(t.items.find((i) => i.id === feat.id) as MenuItem)}
+                onClick={() => openModal(t.items.find((i) => i.id === feat.id) as unknown as MenuItem)}
                 className="group relative rounded-2xl overflow-hidden cursor-pointer text-left"
                 style={{ height: "243px" }}
               >
@@ -551,7 +551,7 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
           {[featA, featB, featC].map((feat) => (
             <button
               key={feat.id}
-              onClick={() => openModal(t.items.find((i) => i.id === feat.id) as MenuItem)}
+              onClick={() => openModal(t.items.find((i) => i.id === feat.id) as unknown as MenuItem)}
               className="relative rounded-2xl overflow-hidden cursor-pointer text-left shrink-0"
               style={{ width: "78vw", maxWidth: "300px", aspectRatio: "3/4", scrollSnapAlign: "start" }}
             >
