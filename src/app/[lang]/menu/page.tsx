@@ -58,7 +58,7 @@ function ItemModal({
   onSelectPairing,
 }: {
   item: MenuItem;
-  t: ReturnType<typeof LANG[Locale]["menuPage"]["items"][number]> & { modalOrder: string; modalNotes: string; modalPairings: string; modalSpiceNone: string; modalSpiceMild: string; modalSpiceHot: string; modalReviews: string; modalPrepTime: string };
+  t: typeof LANG[Locale]["menuPage"]
   lang: Locale;
   onClose: () => void;
   onSelectPairing: (id: number) => void;
