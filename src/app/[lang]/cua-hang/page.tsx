@@ -40,7 +40,7 @@ function StatusBadge({ status, t }: { status: "open" | "coming"; t: { openNow: s
 }
 
 // ─── Featured branch card ─────────────────────────────────────────────────────
-function FeaturedCard({ branch, t }: { branch: Branch; t: ReturnType<typeof LANG[Locale]["storePage"]> }) {
+function FeaturedCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["storePage"] }) {
   return (
     // Ẩn trên mobile, chỉ hiện từ md trở lên
     <div
@@ -244,7 +244,7 @@ function FeaturedCard({ branch, t }: { branch: Branch; t: ReturnType<typeof LANG
 }
 
 // ─── Other branch row card ────────────────────────────────────────────────────
-function BranchRow({ branch, t }: { branch: Branch; t: ReturnType<typeof LANG[Locale]["storePage"]> }) {
+function BranchRow({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["storePage"] }) {
   return (
     <div
       style={{
@@ -412,7 +412,7 @@ function BranchRow({ branch, t }: { branch: Branch; t: ReturnType<typeof LANG[Lo
 }
 
 // ─── Mobile Carousel Card ─────────────────────────────────────────────────────
-function MobileCarouselCard({ branch, t }: { branch: Branch; t: ReturnType<typeof LANG[Locale]["storePage"]> }) {
+function MobileCarouselCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["storePage"] }) {
   return (
     <div
       style={{
@@ -516,7 +516,7 @@ function MobileCarouselCard({ branch, t }: { branch: Branch; t: ReturnType<typeo
 }
 
 // ─── Mobile Carousel ──────────────────────────────────────────────────────────
-function MobileCarousel({ branches, t }: { branches: Branch[]; t: ReturnType<typeof LANG[Locale]["storePage"]> }) {
+function MobileCarousel({ branches, t }: { branches: Branch[]; t: typeof LANG[Locale]["storePage"] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
