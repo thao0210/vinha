@@ -1,3 +1,4 @@
+import ScrollToTop from "@/components/ScrollToTop";
 import { notFound } from "next/navigation";
 
 const LOCALES = ["vi", "en"];
@@ -11,5 +12,8 @@ export default async function LangLayout({
 }) {
   const { lang } = await params;
   if (!LOCALES.includes(lang)) notFound();
-  return <div>{children}</div>;
+  return <div>
+    {children}
+    <ScrollToTop />
+  </div>;
 }

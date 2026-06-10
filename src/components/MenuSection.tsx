@@ -1,97 +1,195 @@
 "use client";
-import { ArrowRight } from "lucide-react";
-import { LANG, Locale } from "@/lib/lang";
-
-const BEST_SELLERS = [
-  { img: "/images/img1.jpeg",  name: "Cơm sườn nướng", price: "65.000đ", tag: "🔥 Hot" },
-  { img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=300&h=300&fit=crop", name: "Cơm văn phòng",  price: "49.000đ", tag: "⭐ Best" },
-  { img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=300&h=300&fit=crop",  name: "Combo đặc biệt", price: "79.000đ", tag: "🎯 Mới" },
-  { img: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=300&h=300&fit=crop", name: "Cơm gà xối mỡ",  price: "55.000đ", tag: null },
-];
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useState } from "react";
+import { Locale, LANG } from "@/lib/lang";
 
 export default function MenuSection({ lang }: { lang: Locale }) {
+  const t = LANG[lang].menu;
+  const desktopScrollRef = useRef<HTMLDivElement>(null);
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const [mobileIndex, setMobileIndex] = useState(0);
+
+  const scroll = (dir: "left" | "right") => {
+    if (!desktopScrollRef.current) return;
+    const amount = 340;
+    desktopScrollRef.current.scrollBy({ left: dir === "right" ? amount : -amount, behavior: "smooth" });
+  };
+
+  const swipeMobile = (dir: "left" | "right") => {
+    if (!mobileScrollRef.current) return;
+    const container = mobileScrollRef.current;
+    const cardWidth = container.offsetWidth;
+    const next = dir === "right"
+      ? Math.min(mobileIndex + 1, t.items.length - 1)
+      : Math.max(mobileIndex - 1, 0);
+    container.scrollTo({ left: next * cardWidth, behavior: "smooth" });
+    setMobileIndex(next);
+  };
+
+  const handleMobileScroll = () => {
+    if (!mobileScrollRef.current) return;
+    const container = mobileScrollRef.current;
+    const idx = Math.round(container.scrollLeft / container.offsetWidth);
+    setMobileIndex(idx);
+  };
+
   return (
-    <section id="menu" className="py-24 bg-[#ffd3b6] overflow-hidden">
+    <section id="menu" className="py-16 overflow-hidden" style={{ backgroundColor: "#FCF4E9" }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
         {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16">
-          <div>
-            <span className="inline-block text-xs font-black tracking-[0.2em] uppercase text-orange-500 mb-3">
-              ✦ Best Seller
-            </span>
-            <h2 className="text-4xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
-              Món được yêu<br />
-              <span className="text-red-700">thích nhất</span>
-            </h2>
-          </div>
-            <a
-          
-            href={`/${lang}/menu`}
-            className="
-              group inline-flex items-center gap-2 self-start sm:self-auto
-              font-bold text-sm text-red-700 transition-colors
-              border-b-2 border-red-700 pb-0.5
-            "
+        <div className="flex items-baseline justify-between pb-5 mb-10 border-b border-heading">
+          <h2
+            style={{
+              color: "var(--color-body)",
+              fontFamily: "'Momo Trust Display', sans-serif",
+              fontWeight: 400,
+              fontSize: "clamp(1.2rem, 3vw, 2.5rem)",
+            }}
           >
-            Xem tất cả thực đơn
-            <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+            {t.title}
+          </h2>
+          <a
+            href={`/${lang}/menu`}
+            className="group inline-flex items-center gap-1.5 text-md font-semibold transition-opacity hover:opacity-70"
+            style={{ color: "var(--color-heading)", fontFamily: "'Archivo', sans-serif" }}
+          >
+            {t.viewAll}
+            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </a>
         </div>
 
-        {/* ── Cards ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8">
-          {BEST_SELLERS.map((item, i) => (
-            <div
-              key={i}
-              className="group cursor-pointer"
-            >
-              {/* Image */}
-              <div className="relative aspect-square rounded-2xl overflow-hidden mb-4 shadow-md">
-                <img
-                  src={item.img}
-                  alt={item.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
+        {/* ── Desktop Carousel ── */}
+        <div className="hidden lg:flex items-center gap-6">
+          <button
+            onClick={() => scroll("left")}
+            aria-label="Previous"
+            className="flex-none w-12 h-12 rounded-full flex items-center justify-center transition-all hover:opacity-70"
+            style={{ border: "2px solid var(--color-heading)" }}
+          >
+            <ChevronLeft size={22} style={{ color: "var(--color-heading)" }} />
+          </button>
 
-                {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-
-                {/* Tag */}
-                {item.tag && (
-                  <span className="absolute top-3 left-3 text-[11px] font-extrabold bg-white/90 backdrop-blur text-gray-800 px-2.5 py-1 rounded-full shadow">
-                    {item.tag}
-                  </span>
-                )}
-
-                {/* Order button — appears on hover */}
-                <div className="
-                  absolute bottom-3 inset-x-3
-                  opacity-0 translate-y-2
-                  group-hover:opacity-100 group-hover:translate-y-0
-                  transition-all duration-300
-                ">
-                  <button
-                    className="w-full flex items-center justify-center gap-1.5 text-white text-xs font-bold py-2.5 rounded-xl"
-                    style={{ background: "linear-gradient(135deg, #ff6b2b, #c0152a)" }}
-                  >
-                    Đặt ngay <ArrowRight size={12} />
-                  </button>
+          <div
+            ref={desktopScrollRef}
+            className="flex-1 flex gap-8 overflow-x-auto pb-4"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {t.items.map((item, i) => (
+              <div
+                key={i}
+                className="flex-none flex flex-col items-center group cursor-pointer"
+                style={{ width: "calc((100% - 64px) / 3)" }}
+              >
+                <div className="w-full flex items-end justify-center mb-5" style={{ height: "280px" }}>
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105 drop-shadow-md"
+                    style={{ height: "100%", width: "auto" }}
+                  />
                 </div>
-              </div>
-
-              {/* Info */}
-              <div className="px-1">
-                <h3 className="font-bold text-gray-900 text-base mb-1 group-hover:text-red-700 transition-colors">
+                <h3
+                  className="font-bold mb-1 text-center"
+                  style={{
+                    color: "var(--color-body)",
+                    fontFamily: "'Momo Trust Display', sans-serif",
+                    fontWeight: 400,
+                    fontSize: "clamp(1.1rem, 2vw, 1.35rem)",
+                  }}
+                >
                   {item.name}
                 </h3>
-                <p className="text-red-600 font-extrabold text-lg">
+                <p
+                  className="font-extrabold text-center"
+                  style={{
+                    color: "var(--color-heading)",
+                    fontFamily: "'Archivo', sans-serif",
+                    fontSize: "clamp(1rem, 1.5vw, 1.15rem)",
+                  }}
+                >
                   {item.price}
                 </p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          <button
+            onClick={() => scroll("right")}
+            aria-label="Next"
+            className="flex-none w-12 h-12 rounded-full flex items-center justify-center transition-all hover:opacity-70"
+            style={{ border: "2px solid var(--color-heading)" }}
+          >
+            <ChevronRight size={22} style={{ color: "var(--color-heading)" }} />
+          </button>
         </div>
+
+        {/* ── Mobile Swipe Carousel ── */}
+        <div className="lg:hidden">
+            <div className="-mx-6">
+                <div
+                ref={mobileScrollRef}
+                onScroll={handleMobileScroll}
+                className="flex overflow-x-auto snap-x snap-mandatory"
+                style={{
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                    paddingLeft: "5%",
+                    paddingRight: "5%",
+                }}
+                >
+                {t.items.map((item, i) => (
+                    <div
+                    key={i}
+                    className="flex-none snap-center flex flex-col items-center px-3"
+                    style={{ width: "90%" }}
+                    >
+                    {/* Food image */}
+                    <div className="w-full flex items-end justify-center mb-5" style={{ height: "260px" }}>
+                        <img
+                        src={item.img}
+                        alt={item.name}
+                        className="max-w-full max-h-full object-contain drop-shadow-md"
+                        style={{ height: "100%", width: "auto" }}
+                        />
+                    </div>
+                    <h3
+                        className="mb-1 text-center"
+                        style={{
+                        color: "var(--color-body)",
+                        fontFamily: "'Momo Trust Display', sans-serif",
+                        fontWeight: 400,
+                        fontSize: "1.3rem",
+                        }}
+                    >
+                        {item.name}
+                    </h3>
+                    <p
+                        className="font-extrabold text-center"
+                        style={{
+                        color: "var(--color-heading)",
+                        fontFamily: "'Archivo', sans-serif",
+                        fontSize: "1.1rem",
+                        }}
+                    >
+                        {item.price}
+                    </p>
+                    </div>
+                ))}
+                </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mt-6 mx-6 h-[3px] rounded-full overflow-hidden" style={{ backgroundColor: "#E5DDD5" }}>
+                <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                    backgroundColor: "var(--color-heading)",
+                    width: `${((mobileIndex + 1) / t.items.length) * 100}%`,
+                }}
+                />
+            </div>
+            </div>
 
       </div>
     </section>

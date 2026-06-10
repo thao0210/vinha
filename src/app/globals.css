@@ -1,26 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Brand colors ── */
+  --color-heading:    #811620;   /* logo, headings */
+  --color-body:       #2A2925;   /* body text */
+  --color-background: #ffffff;
+  --color-secondary:   #716160;
+
+  /* ── Fonts ── */
+  --font-display: var(--font-momo);      /* Momo Trust Display */
+  --font-sans:    var(--font-archivo);   /* Archivo */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-body);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Expose brand colors as Tailwind utilities */
+  --color-heading:    var(--color-heading);
+  --color-body:       var(--color-body);
+  --color-secondary:  var(--color-secondary);
+
+  /* Fonts */
+  --font-display: var(--font-display);
+  --font-sans:    var(--font-sans);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-body);
+  font-family: var(--font-sans), Archivo, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+  font-family: var(--font-display), "Momo Trust Display", sans-serif;
 }

@@ -1,60 +1,115 @@
 "use client";
-import { ArrowRight, ChefHat, Package, Utensils } from "lucide-react";
+import { useRef, useState } from "react";
 import { LANG, Locale } from "@/lib/lang";
 
-const OPS = [
-  {
-    src: "https://blog.clover.com/wp-content/uploads/2023/01/staff-cooking-in-restaurant-commercial-kitchen.jpg",
-    label: "Nhà bếp",
-    Icon: ChefHat,
-    span: "row-span-2",
-  },
-  {
-    src: "https://static.wixstatic.com/media/eac48a_b60e0dee864f486cb1c046458b25c02a~mv2.jpg/v1/fill/w_640,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/eac48a_b60e0dee864f486cb1c046458b25c02a~mv2.jpg",
-    label: "Đóng gói",
-    Icon: Package,
-    span: "",
-  },
-  {
-    src: "https://saigonrachgiahotel.vn/files/images/recruitment/td00005.jpeg",
-    label: "Phục vụ",
-    Icon: Utensils,
-    span: "",
-  },
-];
-
 export default function CTABanner({ lang }: { lang: Locale }) {
-  const t = LANG[lang].cta;
- 
+  const t = LANG[lang].ctaBanner;
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const [mobileIndex, setMobileIndex] = useState(0);
+
+  const handleMobileScroll = () => {
+    if (!mobileScrollRef.current) return;
+    const container = mobileScrollRef.current;
+    const idx = Math.round(container.scrollLeft / container.offsetWidth);
+    setMobileIndex(idx);
+  };
+
   return (
-    <section className="w-full" style={{ backgroundColor: "#FEF0E4" }}>
- 
-      {/* ── 3 images full-width, equal size ── */}
-      <div className="flex w-full" style={{ height: "220px", marginBottom: "2px" }}>
-        {OPS.map(({ src, label, Icon }, i) => (
-          <div key={i} className="relative flex-1 overflow-hidden group">
-            <img
-              src={src}
-              alt={label}
-              className="w-full h-full object-cover brightness-90 group-hover:brightness-100 group-hover:scale-105 transition-all duration-700"
-            />
-            {/* gradient for label readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
- 
-            {/* label pill */}
-            <span className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap">
-              <Icon size={13} />
-              {label}
-            </span>
- 
-            {/* divider between panels */}
-            {i < OPS.length - 1 && (
-              <div className="absolute right-0 top-0 bottom-0 w-[3px]" style={{ backgroundColor: "#FEF0E4" }} />
-            )}
+    <section className="bg-white py-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+
+        {/* Title */}
+        <h2
+          className="text-center mb-8 lg:mb-12"
+          style={{
+            fontFamily: "'Momo Trust Display', sans-serif",
+            fontWeight: 400,
+            fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+            color: "var(--color-body)",
+          }}
+        >
+          {t.title}
+        </h2>
+
+        {/* Desktop: 3-column grid */}
+        <div className="hidden lg:grid grid-cols-3 gap-6">
+          {t.ops.map((op, i) => (
+            <div key={i} className="flex flex-col items-center gap-4">
+              <div className="w-full overflow-hidden rounded-2xl" style={{ aspectRatio: "4/3" }}>
+                <img
+                  src={op.img}
+                  alt={op.label}
+                  onError={(e) => { (e.target as HTMLImageElement).src = op.fallback; }}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                className="text-center font-semibold text-xl"
+                style={{
+                  fontFamily: "'Archivo', sans-serif",
+                  color: "var(--color-heading)",
+                }}
+              >
+                {op.label}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile: swipe carousel */}
+        <div className="lg:hidden">
+          <div className="-mx-6">
+            <div
+              ref={mobileScrollRef}
+              onScroll={handleMobileScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none", paddingLeft: "5%", paddingRight: "5%" }}
+            >
+              {t.ops.map((op, i) => (
+                <div
+                  key={i}
+                  className="flex-none w-full snap-center px-3 flex flex-col items-center gap-4"
+                    style={{ width: "90%" }}
+                >
+                  <div className="w-full overflow-hidden rounded-2xl" style={{ aspectRatio: "4/3" }}>
+                    <img
+                      src={op.img}
+                      alt={op.label}
+                      onError={(e) => { (e.target as HTMLImageElement).src = op.fallback; }}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p
+                    className="text-center font-semibold text-lg"
+                    style={{
+                      fontFamily: "'Archivo', sans-serif",
+                      color: "var(--color-heading)",
+                    }}
+                  >
+                    {op.label}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-2 mt-5">
+            {t.ops.map((_, i) => (
+              <span
+                key={i}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === mobileIndex ? "20px" : "8px",
+                  height: "8px",
+                  backgroundColor: i === mobileIndex ? "var(--color-heading)" : "#D1C7C0",
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
       </div>
- 
     </section>
   );
 }
