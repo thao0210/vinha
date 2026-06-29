@@ -50,7 +50,7 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
                 {t.exploreTitle}
               </p>
               <div className="flex flex-col gap-2.5">
-                {t.exploreLinks.map(({ label, href }) => (
+                {t.exploreLinks.map(({ label, href }:{label:string; href:string}) => (
                   <a
                     key={label}
                     href={href}
@@ -80,7 +80,7 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
                 {t.followTitle}
               </p>
               <div className="flex items-center gap-3">
-                {t.social.map(({ label, href, type }) => (
+                {t.social.map(({ label, href, type }: { label: string; href: string; type: string }) => (
                   <a
                     key={label}
                     href={href}
@@ -175,7 +175,7 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
               {t.exploreTitle}
             </p>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
-              {t.exploreLinks.map(({ label, href }) => (
+              {t.exploreLinks.map(({ label, href }: {label: string; href: string}) => (
                 <a
                   key={label}
                   href={href}
@@ -206,7 +206,7 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
               {t.followTitle}
             </p>
             <div className="flex items-center gap-4">
-              {t.social.map(({ label, href, type }) => (
+              {t.social.map(({ label, href, type }:{label:string; href:string; type:string}) => (
                 <a
                   key={label}
                   href={href}
