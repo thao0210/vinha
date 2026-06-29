@@ -32,7 +32,7 @@ export default function CTABanner({ lang, t }: { lang: Locale; t: any }) {
 
         {/* Desktop: 3-column grid */}
         <div className="hidden lg:grid grid-cols-3 gap-6">
-          {t.ops.map((op, i) => (
+          {t.ops.map((op: any, i: number) => (
             <div key={i} className="flex flex-col items-center gap-4">
               <div className="w-full overflow-hidden rounded-2xl" style={{ aspectRatio: "4/3" }}>
                 <img
@@ -64,7 +64,7 @@ export default function CTABanner({ lang, t }: { lang: Locale; t: any }) {
               className="flex overflow-x-auto snap-x snap-mandatory"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none", paddingLeft: "5%", paddingRight: "5%" }}
             >
-              {t.ops.map((op, i) => (
+              {t.ops.map((op: any, i: number) => (
                 <div
                   key={i}
                   className="flex-none w-full snap-center px-3 flex flex-col items-center gap-4"
@@ -94,7 +94,7 @@ export default function CTABanner({ lang, t }: { lang: Locale; t: any }) {
 
           {/* Dot indicators */}
           <div className="flex justify-center gap-2 mt-5">
-            {t.ops.map((_, i) => (
+            {t.ops.map((_: any, i:number) => (
               <span
                 key={i}
                 className="rounded-full transition-all duration-300"
