@@ -21,7 +21,7 @@ export default function WhyUs({ lang, t }: { lang: Locale; t: any }) {
 
         {/* ── Cards ── */}
         <div className="grid md:grid-cols-3 gap-6">
-          {t.items.map((item, i) => (
+          {t.items.map((item: any, i:number) => (
             <div
               key={i}
               className="bg-white rounded-2xl p-8 flex flex-col"
