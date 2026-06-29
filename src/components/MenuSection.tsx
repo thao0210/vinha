@@ -74,7 +74,7 @@ export default function MenuSection({ lang, t, orderUrl }: { lang: Locale; t: an
             className="flex-1 flex gap-8 overflow-x-auto pb-4"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {t.items.map((item, i) => (
+            {t.items.map((item: any, i: number) => (
               <a
                 href={orderUrl}
                 key={i}
@@ -138,7 +138,7 @@ export default function MenuSection({ lang, t, orderUrl }: { lang: Locale; t: an
                     paddingRight: "5%",
                 }}
                 >
-                {t.items.map((item, i) => (
+                {t.items.map((item: any, i: number) => (
                     <div
                     key={i}
                     className="flex-none snap-center flex flex-col items-center px-3"

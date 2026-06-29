@@ -79,7 +79,7 @@ export default function Navbar({
 
           {/* ── Desktop nav links ── */}
           <div className="hidden md:flex items-center gap-8">
-            {t.ids.map((id, i) => {
+            {t.ids.map((id: any, i: number) => {
               const href = `/${lang}/${PAGE_SLUGS[id]}`;
               const isActive = pathname.includes(PAGE_SLUGS[id]);
               return (
@@ -155,7 +155,7 @@ export default function Navbar({
               <X size={24} />
             </button>
 
-            {t.ids.map((id, i) => {
+            {t.ids.map((id: any, i: number) => {
               const href = `/${lang}/${PAGE_SLUGS[id]}`;
               const isActive = pathname.includes(PAGE_SLUGS[id]);
               return (

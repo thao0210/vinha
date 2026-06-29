@@ -48,7 +48,7 @@ export default function StoreList({ lang, t, orderUrl }: { lang: Locale; t: any,
 
         {/* ── Desktop Store rows ── */}
         <div className="hidden lg:block">
-          {visibleStores.map((store, i) => (
+          {visibleStores.map((store: any, i: number) => (
             <div
               key={i}
               className={`
@@ -143,7 +143,7 @@ export default function StoreList({ lang, t, orderUrl }: { lang: Locale; t: any,
               style={{ scrollbarWidth: "none", msOverflowStyle: "none", paddingLeft: "5%",
         paddingRight: "5%", }}
             >
-              {visibleStores.map((store, i) => (
+              {visibleStores.map((store: any, i: number) => (
                 <div
                   key={i}
                   className="flex-none w-full snap-center px-3"
@@ -240,7 +240,7 @@ export default function StoreList({ lang, t, orderUrl }: { lang: Locale; t: any,
 
           {/* Dot indicators */}
           <div className="flex justify-center gap-2 mt-5">
-            {visibleStores.map((_, i) => (
+            {visibleStores.map((_: any, i: number) => (
               <span
                 key={i}
                 className="rounded-full transition-all duration-300"

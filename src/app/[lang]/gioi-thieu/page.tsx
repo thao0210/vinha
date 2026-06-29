@@ -343,7 +343,7 @@ export default function GioiThieuPage({ params }: { params: Promise<{ lang: Loca
             </h2>
 
             <div className="flex flex-col gap-12">
-            {t.values.map((val, idx) => (
+            {t.values.map((val: any, idx: number) => (
                 <div
                 key={idx}
                 className="flex flex-col-reverse sm:flex-row items-start gap-6 sm:gap-8"
@@ -462,7 +462,7 @@ export default function GioiThieuPage({ params }: { params: Promise<{ lang: Loca
           transform: `translateX(calc(-${galleryOffset} * (25% + 1rem)))`,
         }}
       >
-        {t.gallery.map((item, i) => (
+        {t.gallery.map((item: any, i: number) => (
           <div
             key={i}
             className="shrink-0 overflow-hidden"
@@ -491,7 +491,7 @@ export default function GioiThieuPage({ params }: { params: Promise<{ lang: Loca
             setMobileScrollIdx(Math.min(idx, t.gallery.length - 1));
             }}
         >
-            {t.gallery.map((item, i) => (
+            {t.gallery.map((item: any, i: number) => (
             <div
                 key={i}
                 className="shrink-0 snap-start overflow-hidden"
