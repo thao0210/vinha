@@ -1,9 +1,7 @@
 "use client";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
-export default function WhyUs({ lang }: { lang: Locale }) {
-  const t = LANG[lang].why;
-
+export default function WhyUs({ lang, t }: { lang: Locale; t: any }) {
   return (
     <section id="why" className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">

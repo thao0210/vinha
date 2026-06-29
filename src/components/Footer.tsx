@@ -1,6 +1,6 @@
 "use client";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
 function SocialIcon({ type }: { type: string }) {
   if (type === "facebook")  return <FaFacebookF size={18} />;
@@ -9,9 +9,7 @@ function SocialIcon({ type }: { type: string }) {
   return null;
 }
 
-export default function Footer({ lang }: { lang: Locale }) {
-  const t = LANG[lang].footer;
-
+export default function Footer({ lang, t }: { lang: Locale; t: any }) {
   return (
     <footer className="text-white pt-16 pb-12" style={{ backgroundColor: "#7F1D1D" }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10">

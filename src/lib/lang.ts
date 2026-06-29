@@ -14,16 +14,16 @@ export const LANG = {
     },
 
     // ── HERO ──────────────────────────────────────────────────
-    hero: {
-      badge:    "Bữa ăn chuẩn vị Việt",
-      titleTop: "Dẫu ngày bận rộn,",
-      titleRed: "vẫn trọn vị nhà",
-      subtitle: "Ngon lành - tươm tất - xứng tầm giá",
-      cta:      "Xem thực đơn",
-      banner:   "/images/banner.png",
-      phone:    "tel:+84909123456",
-      zalo:     "https://zalo.me/84909123456",
-    },
+    // hero: {
+    //   badge:    "Bữa ăn chuẩn vị Việt",
+    //   titleTop: "Dẫu ngày bận rộn,",
+    //   titleRed: "vẫn trọn vị nhà",
+    //   subtitle: "Ngon lành - tươm tất - xứng tầm giá",
+    //   cta:      "Xem thực đơn",
+    //   banner:   "/images/banner.png",
+    //   phone:    "tel:+84909123456",
+    //   zalo:     "https://zalo.me/84909123456",
+    // },
 
     // ── STATS (trang chủ) ─────────────────────────────────────
     stats: [
@@ -442,7 +442,7 @@ export const LANG = {
       // Gallery
       galleryTitle:    "Đằng sau mỗi bữa ăn",
       gallerySubtitle: "Mỗi món ăn là kết quả của sự chăm chút kỹ càng, chế biến chỉnh chu và một trái tim luôn muốn mang điều tốt nhất đến bạn.",
-      galleryLink:     "Khám phá hành trình của chúng tôi →",
+      galleryLink:     "Khám phá hành trình của chúng tôi",
       gallery: [
         { img: "/images/about5.png" },
         { img: "/images/about6.png"  },
@@ -595,7 +595,7 @@ export const LANG = {
       ctaTitle: "Cooked like it's for family",
       ctaImg: "/images/cta-mascot.png",
       ctaDesc:  "Every portion is freshly prepared each day, carefully packed and delivered on time so you always enjoy a warm, wholesome meal.",
-      ctaBtn:   "Order Now →",
+      ctaBtn:   "Order Now",
 
       title:      "Our Menu",
       subtitle:   "Restaurant-quality lunch, delivered hot in 30 minutes",
@@ -778,10 +778,10 @@ export const LANG = {
       heroTitleLine2: "Promotions",
       heroSubtitle:   "Exciting deals every day from Vị Nhà",
       heroBanner:     "/images/promo-banner.png",
-      heroOrderBtn:   "Order Now →",
+      heroOrderBtn:   "Order Now",
 
       // Labels
-      ctaBtn:     "Order Now →",
+      ctaBtn:     "Order Now",
 
       items: [
         {
@@ -831,7 +831,7 @@ export const LANG = {
       openNow:           "Open",
       comingSoon:        "Coming Soon",
       hours:             "Opening Hours",
-      orderNow:          "Order Now →",
+      orderNow:          "Order Now",
       call:              "Call",
       getDirection:      "Directions",
       featuredLabel:     "FEATURED BRANCH",
@@ -880,7 +880,7 @@ export const LANG = {
       // Gallery
       galleryTitle:    "Behind Every Meal",
       gallerySubtitle: "Every dish is the result of meticulous care, thoughtful preparation and a heart that always wants to bring you the best.",
-      galleryLink:     "Explore our journey →",
+      galleryLink:     "Explore our journey",
       gallery: [
         { img: "/images/about5.png" },
         { img: "/images/about6.png" },
@@ -892,7 +892,7 @@ export const LANG = {
       // CTA
       ctaTitle: "Ready to try Vị Nhà?",
       ctaDesc:  "A wholesome meal is waiting for you",
-      ctaBtn:   "Order Now →",
+      ctaBtn:   "Order Now",
       ctaImg:   "/images/about-mascot2.png",
     },
   },

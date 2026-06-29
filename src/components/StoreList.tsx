@@ -1,10 +1,9 @@
 "use client";
 import { Store, ArrowRight, MapPin, Clock } from "lucide-react";
 import { useRef, useState } from "react";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
-export default function StoreList({ lang }: { lang: Locale }) {
-  const t = LANG[lang].stores;
+export default function StoreList({ lang, t, orderUrl }: { lang: Locale; t: any, orderUrl: string }) {
   const visibleStores = t.list.slice(0, 3);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [mobileIndex, setMobileIndex] = useState(0);
@@ -16,6 +15,7 @@ export default function StoreList({ lang }: { lang: Locale }) {
     setMobileIndex(idx);
   };
 
+  console.log('url', orderUrl);
   return (
     <section id="stores" className="py-14" style={{ backgroundColor: "#FDF3EC" }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
@@ -98,7 +98,10 @@ export default function StoreList({ lang }: { lang: Locale }) {
 
               {/* Actions */}
               <div className="flex items-center gap-6 flex-shrink-0">
-                <button
+                <a
+                  href={orderUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full transition-all hover:opacity-70"
                   style={{
                     border: "1.5px solid #D1C7C0",
@@ -108,11 +111,13 @@ export default function StoreList({ lang }: { lang: Locale }) {
                     color: "var(--color-body)",
                   }}
                 >
-                  {LANG[lang].nav.order}
+                  {t.orderLabel}
                   <ArrowRight size={14} />
-                </button>
+                </a>
                 <a
-                  href="#"
+                  href={store.mapSrc}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 font-semibold transition-opacity hover:opacity-70"
                   style={{
                     fontFamily: "'Archivo', sans-serif",
@@ -199,17 +204,22 @@ export default function StoreList({ lang }: { lang: Locale }) {
 
                       {/* Action buttons */}
                       <div className="flex gap-3">
-                        <button
+                        <a
+                          href={orderUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-white font-semibold text-sm"
                           style={{
                             background: "var(--color-heading)",
                             fontFamily: "'Archivo', sans-serif",
                           }}
                         >
-                          {LANG[lang].nav.order}
-                        </button>
+                          {t.orderLabel}
+                        </a>
                         <a
-                          href="#"
+                          href={store.mapSrc}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm"
                           style={{
                             border: "1.5px solid #D1C7C0",

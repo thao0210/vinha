@@ -1,10 +1,13 @@
 "use client";
 import { use, useState, useEffect, useCallback, useRef } from "react";
-import { Flame, Sparkles, X, Star, ChevronRight } from "lucide-react";
+import { Flame, Sparkles, X, Star, ChevronRight, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 import { useRouter, usePathname } from "next/navigation";
+import { getMenuPageData } from "@/lib/queryMenuPage";
+import { transformMenuPage } from "@/lib/transformMenuPage";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type SpiceLevel = "none" | "mild" | "hot";
@@ -56,12 +59,14 @@ function ItemModal({
   lang,
   onClose,
   onSelectPairing,
+  site
 }: {
   item: MenuItem;
-  t: typeof LANG[Locale]["menuPage"]
+  t: any;
   lang: Locale;
   onClose: () => void;
   onSelectPairing: (id: number) => void;
+  site: any;
 }) {
   // Close on Escape
   useEffect(() => {
@@ -225,12 +230,13 @@ function ItemModal({
 
         {/* Sticky CTA */}
         <div className="shrink-0 px-5 py-4 border-t" style={{ borderColor: "#F0E8DF" }}>
-          <button
-            className="w-full py-4 rounded-full font-bold text-base text-white transition-opacity active:opacity-80"
+          <a
+            href={site.orderUrl}
+            className="block text-center w-full py-4 rounded-full font-bold text-base text-white transition-opacity active:opacity-80"
             style={{ backgroundColor: "#6B1111" }}
           >
             {t.modalOrder}
-          </button>
+          </a>
         </div>
       </div>
 
@@ -318,12 +324,13 @@ function ItemModal({
                   </span>
                 </div>
               </div>
-              <button
-                className="mt-auto w-full py-3.5 rounded-full font-bold text-base text-white transition-opacity hover:opacity-90"
+              <a
+                href={site.orderUrl}
+                className="mt-auto w-full py-3.5 rounded-full font-bold text-base text-center text-white transition-opacity hover:opacity-90"
                 style={{ backgroundColor: "#6B1111" }}
               >
                 {t.modalOrder}
-              </button>
+              </a>
             </div>
           </div>
 
@@ -368,13 +375,20 @@ function ItemModal({
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function MenuPage({ params }: { params: Promise<{ lang: Locale }> }) {
   const { lang } = use(params);
-  const t = LANG[lang].menuPage;
+  const site = useSiteSettings(lang);
+  const [t, setT] = useState<ReturnType<typeof transformMenuPage> | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [activeFeatIndex, setActiveFeatIndex] = useState(0);
   const featScrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    getMenuPageData().then((raw) => {
+      setT(transformMenuPage(raw, lang) as any);
+    });
+  }, [lang]);
 
   const handleLangChange = (newLang: Locale) => {
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
@@ -384,9 +398,14 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
   const openModal = useCallback((item: MenuItem) => setSelectedItem(item), []);
   const closeModal = useCallback(() => setSelectedItem(null), []);
   const handleSelectPairing = useCallback((id: number) => {
+    if (!t) return;
     const found = (t.items as unknown as MenuItem[]).find((i) => i.id === id);
     if (found) setSelectedItem(found);
-  }, [t.items]);
+  }, [t]);
+
+  if (!t || !site) {
+    return <div className="min-h-screen" style={{ backgroundColor: "#FAF5EE" }} />;
+  }
 
   const tabs = [
     { key: "all",      label: t.all      },
@@ -419,7 +438,7 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FAF5EE" }}>
-      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" />
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" t={site.nav} orderUrl={site.orderUrl} />
 
       {/* ── HERO — Full-screen banner (desktop) / Wave banner (mobile) ── */}
       {/* Desktop: image shifted down 20%, text pushed toward top */}
@@ -695,11 +714,12 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
           {/* Col 3: button */}
           <div className="flex justify-center">
             <a
-              href="#"
+              href={site.orderUrl}
               className="flex items-center gap-2 text-sm font-bold px-8 py-3.5 rounded-full shadow-md transition-opacity hover:opacity-90"
               style={{ backgroundColor: "#fff", color: "#1C0A0A" }}
             >
               {t.ctaBtn}
+              <ArrowRight size={14} />
             </a>
           </div>
         </div>
@@ -727,17 +747,17 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
         {/* CTA button row */}
         <div className="px-4 pb-4">
           <a
-            href="#"
-            className="flex items-center justify-between w-full px-5 py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90"
+            href={site.orderUrl}
+            className="flex items-center justify-center w-full px-5 py-3.5 rounded-full font-bold text-sm transition-opacity hover:opacity-90"
             style={{ backgroundColor: "#fff", color: "#1C0A0A" }}
           >
             <span>{t.ctaBtn}</span>
-            <span>→</span>
+            <ArrowRight size={14} className="ml-2" />
           </a>
         </div>
       </section>
 
-      <Footer lang={lang} />
+      <Footer lang={lang} t={site.footer} />
 
       {/* ── MODAL ── */}
       {selectedItem && (
@@ -747,6 +767,7 @@ export default function MenuPage({ params }: { params: Promise<{ lang: Locale }>
           lang={lang}
           onClose={closeModal}
           onSelectPairing={handleSelectPairing}
+          site={site}
         />
       )}
     </div>

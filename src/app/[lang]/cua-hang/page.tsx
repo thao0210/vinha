@@ -1,10 +1,13 @@
 "use client";
-import { use, useState, useMemo, useRef } from "react";
-import { MapPin, Clock, Phone, Search } from "lucide-react";
+import { use, useState, useMemo, useRef, useEffect } from "react";
+import { MapPin, Clock, Phone, Search, ChevronDown, X, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Locale, LANG } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 import { useRouter, usePathname } from "next/navigation";
+import { getStorePageData } from "@/lib/queryStorePage";
+import { transformStorePage } from "@/lib/transformStorePage";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Branch = {
@@ -17,6 +20,173 @@ type Branch = {
   img: string;
   mapSrc: string;
 };
+
+// ─── City data ────────────────────────────────────────────────────────────────
+type City = {
+  id: string;
+  nameVi: string;
+  nameEn: string;
+  /** Từ khóa dùng để match với branch.address */
+  keywords: string[];
+};
+
+const CITIES: City[] = [
+  {
+    id: "hcm",
+    nameVi: "TP. Hồ Chí Minh",
+    nameEn: "Ho Chi Minh City",
+    keywords: ["hồ chí minh", "ho chi minh", "hcm", "tp hcm", "tp.hcm", "sài gòn", "sai gon"],
+  },
+  {
+    id: "hn",
+    nameVi: "Hà Nội",
+    nameEn: "Hanoi",
+    keywords: ["hà nội", "ha noi", "hanoi", "hà noi"],
+  },
+  {
+    id: "dn",
+    nameVi: "Đà Nẵng",
+    nameEn: "Da Nang",
+    keywords: ["đà nẵng", "da nang", "danang"],
+  },
+];
+
+// ─── City Modal ───────────────────────────────────────────────────────────────
+function CityModal({
+  open,
+  onClose,
+  selectedCity,
+  onSelect,
+  lang,
+}: {
+  open: boolean;
+  onClose: () => void;
+  selectedCity: string | null;
+  onSelect: (cityId: string | null) => void;
+  lang: string;
+}) {
+  if (!open) return null;
+
+  const handleSelect = (cityId: string) => {
+    if (selectedCity === cityId) {
+      onSelect(null); // bỏ chọn nếu click lại
+    } else {
+      onSelect(cityId);
+    }
+    onClose();
+  };
+
+  return (
+    /* Backdrop */
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.40)",
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+      }}
+    >
+      {/* Panel */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: "20px",
+          padding: "28px 24px 24px",
+          width: "100%",
+          maxWidth: "380px",
+          boxShadow: "0 16px 48px rgba(0,0,0,0.18)",
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+          <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, color: "#1C0A0A" }}>
+            {lang === "vi" ? "Chọn thành phố" : "Select city"}
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px",
+              color: "#9B8080",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* City list */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {CITIES.map((city) => {
+            const isActive = selectedCity === city.id;
+            return (
+              <button
+                key={city.id}
+                onClick={() => handleSelect(city.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "14px 16px",
+                  borderRadius: "12px",
+                  border: isActive ? "1.5px solid #8B1A1A" : "1.5px solid #E8DDD0",
+                  backgroundColor: isActive ? "#FDF5F5" : "#fff",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  width: "100%",
+                  textAlign: "left",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <MapPin size={16} style={{ color: isActive ? "#8B1A1A" : "#9B8080", flexShrink: 0 }} />
+                  <div>
+                    <p style={{ margin: 0, fontSize: "0.95rem", fontWeight: 600, color: isActive ? "#8B1A1A" : "#1C0A0A" }}>
+                      {lang === "vi" ? city.nameVi : city.nameEn}
+                    </p>
+                    <p style={{ margin: 0, fontSize: "0.78rem", color: "#9B8080", marginTop: "1px" }}>
+                      {lang === "vi" ? city.nameEn : city.nameVi}
+                    </p>
+                  </div>
+                </div>
+                {isActive && <Check size={16} style={{ color: "#8B1A1A", flexShrink: 0 }} />}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Clear button */}
+        {selectedCity && (
+          <button
+            onClick={() => { onSelect(null); onClose(); }}
+            style={{
+              marginTop: "16px",
+              width: "100%",
+              padding: "12px",
+              borderRadius: "999px",
+              border: "1.5px solid #D9C8B8",
+              backgroundColor: "#fff",
+              color: "#9B8080",
+              fontWeight: 600,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+            }}
+          >
+            {lang === "vi" ? "Bỏ lọc thành phố" : "Clear city filter"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status, t }: { status: "open" | "coming"; t: { openNow: string; comingSoon: string } }) {
@@ -40,7 +210,7 @@ function StatusBadge({ status, t }: { status: "open" | "coming"; t: { openNow: s
 }
 
 // ─── Featured branch card ─────────────────────────────────────────────────────
-function FeaturedCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["storePage"] }) {
+function FeaturedCard({ branch, t, site }: { branch: Branch; t: any; site: any }) {
   return (
     // Ẩn trên mobile, chỉ hiện từ md trở lên
     <div
@@ -197,7 +367,8 @@ function FeaturedCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["s
 
             {/* Order / Coming soon button */}
             {branch.status === "open" ? (
-              <button
+              <a
+                href={site.orderUrl}
                 style={{
                   width: "100%",
                   padding: "13px",
@@ -216,7 +387,7 @@ function FeaturedCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["s
                 }}
               >
                 {t.orderNow}
-              </button>
+              </a>
             ) : (
               <button
                 disabled
@@ -244,7 +415,7 @@ function FeaturedCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["s
 }
 
 // ─── Other branch row card ────────────────────────────────────────────────────
-function BranchRow({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["storePage"] }) {
+function BranchRow({ branch, t, site }: { branch: Branch; t: any; site: any }) {
   return (
     <div
       style={{
@@ -368,7 +539,8 @@ function BranchRow({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["stor
 
         {/* Order / Coming soon button */}
         {branch.status === "open" ? (
-          <button
+          <a
+            href={site.orderUrl}
             style={{
               width: "100%",
               padding: "10px",
@@ -387,7 +559,7 @@ function BranchRow({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["stor
             }}
           >
             {t.orderNow} →
-          </button>
+          </a>
         ) : (
           <button
             disabled
@@ -412,7 +584,7 @@ function BranchRow({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["stor
 }
 
 // ─── Mobile Carousel Card ─────────────────────────────────────────────────────
-function MobileCarouselCard({ branch, t }: { branch: Branch; t: typeof LANG[Locale]["storePage"] }) {
+function MobileCarouselCard({ branch, t, site }: { branch: Branch; t: any; site: any }) {
   return (
     <div
       style={{
@@ -454,7 +626,8 @@ function MobileCarouselCard({ branch, t }: { branch: Branch; t: typeof LANG[Loca
         {/* Action buttons */}
         <div style={{ display: "flex", gap: "10px" }}>
           {branch.status === "open" ? (
-            <button
+            <a
+              href={site.orderUrl}
               style={{
                 flex: 1,
                 padding: "11px",
@@ -465,10 +638,11 @@ function MobileCarouselCard({ branch, t }: { branch: Branch; t: typeof LANG[Loca
                 fontWeight: 700,
                 fontSize: "0.875rem",
                 cursor: "pointer",
+                textAlign: "center",
               }}
             >
               {t.orderNow}
-            </button>
+            </a>
           ) : (
             <button
               disabled
@@ -516,7 +690,7 @@ function MobileCarouselCard({ branch, t }: { branch: Branch; t: typeof LANG[Loca
 }
 
 // ─── Mobile Carousel ──────────────────────────────────────────────────────────
-function MobileCarousel({ branches, t }: { branches: Branch[]; t: typeof LANG[Locale]["storePage"] }) {
+function MobileCarousel({ branches, t, site }: { branches: Branch[]; t: any; site: any }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -549,7 +723,7 @@ function MobileCarousel({ branches, t }: { branches: Branch[]; t: typeof LANG[Lo
         className="[&::-webkit-scrollbar]:hidden"
       >
         {branches.map((branch) => (
-          <MobileCarouselCard key={branch.id} branch={branch} t={t} />
+          <MobileCarouselCard key={branch.id} branch={branch} t={t} site={site} />
         ))}
       </div>
 
@@ -576,26 +750,35 @@ function MobileCarousel({ branches, t }: { branches: Branch[]; t: typeof LANG[Lo
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale }> }) {
   const { lang } = use(params);
-  const t = LANG[lang].storePage;
+  const site = useSiteSettings(lang);
+  const [t, setT] = useState<ReturnType<typeof transformStorePage> | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
   const [query, setQuery]           = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "open" | "coming">("all");
+  const [cityFilter, setCityFilter]     = useState<string | null>(null);
+  const [cityModalOpen, setCityModalOpen] = useState(false);
+
+  useEffect(() => {
+    getStorePageData().then((raw) => {
+      setT(transformStorePage(raw, lang));
+    });
+  }, [lang]);
 
   const handleLangChange = (newLang: Locale) => {
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
     router.push(newPath);
   };
 
-  const branches = t.branches as unknown as Branch[];
+  const branches = useMemo(() => (t?.branches ?? []) as unknown as Branch[], [t]);
 
   // Featured = first branch; rest = others
   const featured = branches[0];
   const others   = branches.slice(1);
 
   // Whether any filter/search is active
-  const isFiltering = query !== "" || statusFilter !== "all";
+  const isFiltering = query !== "" || statusFilter !== "all" || cityFilter !== null;
 
   // Filtered across ALL branches (mobile carousel + desktop search results)
   const filteredAll = useMemo(() => {
@@ -604,9 +787,15 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
         b.name.toLowerCase().includes(query.toLowerCase()) ||
         b.address.toLowerCase().includes(query.toLowerCase());
       const matchStatus = statusFilter === "all" || b.status === statusFilter;
-      return matchQuery && matchStatus;
+      const matchCity   = cityFilter === null || (() => {
+        const city = CITIES.find((c) => c.id === cityFilter);
+        if (!city) return true;
+        const addr = b.address.toLowerCase();
+        return city.keywords.some((kw) => addr.includes(kw));
+      })();
+      return matchQuery && matchStatus && matchCity;
     });
-  }, [branches, query, statusFilter]);
+  }, [branches, query, statusFilter, cityFilter]);
 
   // Desktop "others" list when not filtering (excludes featured)
   const filteredOthers = useMemo(() => {
@@ -615,13 +804,30 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
         b.name.toLowerCase().includes(query.toLowerCase()) ||
         b.address.toLowerCase().includes(query.toLowerCase());
       const matchStatus = statusFilter === "all" || b.status === statusFilter;
-      return matchQuery && matchStatus;
+      const matchCity   = cityFilter === null || (() => {
+        const city = CITIES.find((c) => c.id === cityFilter);
+        if (!city) return true;
+        const addr = b.address.toLowerCase();
+        return city.keywords.some((kw) => addr.includes(kw));
+      })();
+      return matchQuery && matchStatus && matchCity;
     });
-  }, [others, query, statusFilter]);
+  }, [others, query, statusFilter, cityFilter]);
+
+  if (!t || !site || !featured) {
+    return <div className="min-h-screen" />;
+  }
 
   return (
     <div className="min-h-screen">
-      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" />
+      <CityModal
+        open={cityModalOpen}
+        onClose={() => setCityModalOpen(false)}
+        selectedCity={cityFilter}
+        onSelect={setCityFilter}
+        lang={lang}
+      />
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" t={site.nav} orderUrl={site.orderUrl} />
 
       {/* ── HERO ── */}
 
@@ -774,24 +980,33 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
             </button>
 
             {/* City pill */}
-            <span
+            <button
+                onClick={() => setCityModalOpen(true)}
                 style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "5px",
                 fontSize: "1rem",
                 borderRadius: "999px",
-                border: "1.5px solid #746D673B",
-                color: "#4B3030",
+                border: cityFilter ? "1.5px solid #8B1A1A" : "1.5px solid #746D673B",
+                color: cityFilter ? "#8B1A1A" : "#4B3030",
+                backgroundColor: cityFilter ? "#FDF5F5" : "transparent",
                 padding: "12px 20px",
                 flexShrink: 0,
                 whiteSpace: "nowrap",
                 cursor: "pointer",
+                fontWeight: cityFilter ? 600 : 400,
+                transition: "all 0.15s",
                 }}
             >
-                <MapPin size={18} style={{ color: "#6B1111" }} />
-                {t.filterCity}
-            </span>
+                <MapPin size={18} style={{ color: cityFilter ? "#8B1A1A" : "#6B1111" }} />
+                {cityFilter
+                  ? (lang === "vi"
+                      ? CITIES.find((c) => c.id === cityFilter)?.nameVi
+                      : CITIES.find((c) => c.id === cityFilter)?.nameEn)
+                  : t.filterCity}
+                <ChevronDown size={15} style={{ marginLeft: "2px" }} />
+            </button>
             </div>
         </div>
       </section>
@@ -879,11 +1094,21 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
 
           {/* City tag */}
           <button
-            className="flex-shrink-0 flex items-center gap-1 text-xs font-semibold px-4 py-2 rounded-full border"
-            style={{ color: "#4B3030", borderColor: "#746D673B", backgroundColor: "#fff" }}
+            onClick={() => setCityModalOpen(true)}
+            className="flex-shrink-0 flex items-center gap-1 text-xs font-semibold px-4 py-2 rounded-full border transition-all"
+            style={
+              cityFilter
+                ? { backgroundColor: "#FDF5F5", color: "#8B1A1A", borderColor: "#8B1A1A" }
+                : { color: "#4B3030", borderColor: "#746D673B", backgroundColor: "#fff" }
+            }
           >
             <MapPin size={11} />
-            {t.filterCity}
+            {cityFilter
+              ? (lang === "vi"
+                  ? CITIES.find((c) => c.id === cityFilter)?.nameVi
+                  : CITIES.find((c) => c.id === cityFilter)?.nameEn)
+              : t.filterCity}
+            <ChevronDown size={11} />
           </button>
         </div>
       </section>
@@ -891,7 +1116,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
       {/* ── MOBILE: Carousel – respects active filters ── */}
       {filteredAll.length > 0 ? (
         <section className="md:hidden pt-4 pb-8">
-          <MobileCarousel branches={filteredAll} t={t} />
+          <MobileCarousel branches={filteredAll} t={t} site={site} />
         </section>
       ) : (
         <section className="md:hidden px-4 pb-8 pt-4 text-center">
@@ -906,7 +1131,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
         <>
           {/* Default: FeaturedCard + others list */}
           <section className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
-            <FeaturedCard branch={featured} t={t} />
+            <FeaturedCard branch={featured} t={t} site={site} />
           </section>
 
           {filteredOthers.length > 0 && (
@@ -916,7 +1141,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
               </h2>
               <div className="flex flex-col gap-4">
                 {filteredOthers.map((branch) => (
-                  <BranchRow key={branch.id} branch={branch} t={t} />
+                  <BranchRow key={branch.id} branch={branch} t={t} site={site} />
                 ))}
               </div>
             </section>
@@ -927,7 +1152,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
         <section className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
           <div className="flex flex-col gap-4">
             {filteredAll.map((branch) => (
-              <BranchRow key={branch.id} branch={branch} t={t} />
+              <BranchRow key={branch.id} branch={branch} t={t} site={site} />
             ))}
           </div>
         </section>
@@ -940,7 +1165,7 @@ export default function CuaHangPage({ params }: { params: Promise<{ lang: Locale
         </section>
       )}
 
-      <Footer lang={lang} />
+      <Footer lang={lang} t={site.footer} />
     </div>
   );
 }

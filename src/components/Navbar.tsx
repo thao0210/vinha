@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
 const PAGE_SLUGS: Record<string, string> = {
   menu:   "menu",
@@ -55,12 +55,15 @@ export default function Navbar({
   lang,
   onLangChange,
   variant = "light",
+  t,
+  orderUrl
 }: {
   lang: Locale;
   onLangChange: (l: Locale) => void;
   variant?: "dark" | "light";
+  t: any;
+  orderUrl: string;
 }) {
-  const t = LANG[lang].nav;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -116,13 +119,14 @@ export default function Navbar({
             </div>
 
             {/* Order CTA */}
-            <button
+            <a
+              href={orderUrl}
               className="hidden sm:inline-flex items-center gap-2 text-white text-[15px] font-bold px-5 py-2.5 rounded-full transition-all hover:-translate-y-0.5 hover:shadow-md"
               style={{ background: "linear-gradient(135deg, #991B1B 0%, #7F1D1D 100%)" }}
             >
               {t.order}
               <ArrowRight size={14} />
-            </button>
+            </a>
 
             {/* Mobile hamburger */}
             <button
@@ -168,13 +172,14 @@ export default function Navbar({
               );
             })}
 
-            <button
+            <a
+              href={orderUrl}
               className="mt-6 w-full flex items-center justify-center gap-2 text-white font-bold py-3.5 rounded-full"
               style={{ background: "linear-gradient(135deg, #991B1B 0%, #7F1D1D 100%)" }}
             >
               {t.order}
               <ArrowRight size={15} />
-            </button>
+            </a>
           </div>
         </>
       )}

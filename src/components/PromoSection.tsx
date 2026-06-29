@@ -1,11 +1,9 @@
 "use client";
 import { ArrowRight } from "lucide-react";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
-export default function PromoSection({ lang }: { lang: Locale }) {
-  const t = LANG[lang].promoBanner;
-
-  return (
+export default function PromoSection({ lang, t, orderUrl }: { lang: Locale; t: any; orderUrl: string }) {
+    return (
     <section
       id="promo"
       className="relative overflow-hidden"
@@ -72,7 +70,10 @@ export default function PromoSection({ lang }: { lang: Locale }) {
 
           {/* CTAs */}
           <div className="flex flex-col items-start gap-4">
-            <button
+            <a
+              href={orderUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 font-bold px-7 py-3 rounded-full text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90"
               style={{
                 background: "var(--color-heading)",
@@ -82,7 +83,7 @@ export default function PromoSection({ lang }: { lang: Locale }) {
             >
               {t.cta}
               <ArrowRight size={15} />
-            </button>
+            </a>
 
             <a
               href={`/${lang}/khuyen-mai`}

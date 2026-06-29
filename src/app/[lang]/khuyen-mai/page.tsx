@@ -1,14 +1,17 @@
 "use client";
-import { use, useState, useRef } from "react";
-import { Calendar, Tag, Flame, ChevronLeft, ChevronRight } from "lucide-react";
+import { use, useState, useRef, useEffect } from "react";
+import { Calendar, Tag, Flame, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 import { useRouter, usePathname } from "next/navigation";
+import { getPromoPageData } from "@/lib/queryPromoPage";
+import { transformPromoPage } from "@/lib/transformPromoPage";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type PromoItem = {
-  id: number;
+  id: string;
   badge: string;
   title: string;
   description: string;
@@ -84,7 +87,6 @@ function PromoCarouselDesktop({ items }: { items: PromoItem[] }) {
 
   return (
     <div className="relative">
-      {/* Prev button */}
       <button
         onClick={prev}
         disabled={current === 0}
@@ -95,7 +97,6 @@ function PromoCarouselDesktop({ items }: { items: PromoItem[] }) {
         <ChevronLeft size={20} />
       </button>
 
-      {/* Track */}
       <div className="overflow-hidden">
         <div
           className="flex gap-5 transition-transform duration-300 ease-in-out"
@@ -115,7 +116,6 @@ function PromoCarouselDesktop({ items }: { items: PromoItem[] }) {
         </div>
       </div>
 
-      {/* Next button */}
       <button
         onClick={next}
         disabled={current >= max}
@@ -126,7 +126,6 @@ function PromoCarouselDesktop({ items }: { items: PromoItem[] }) {
         <ChevronRight size={20} />
       </button>
 
-      {/* Dot indicators */}
       {max > 0 && (
         <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: max + 1 }).map((_, i) => (
@@ -171,7 +170,6 @@ function PromoCarouselMobile({ items }: { items: PromoItem[] }) {
 
   return (
     <div className="relative overflow-hidden px-[10%]">
-      {/* Track: each card 80% width so prev/next peek */}
       <div
         ref={trackRef}
         className="flex transition-transform duration-300 ease-in-out"
@@ -193,7 +191,6 @@ function PromoCarouselMobile({ items }: { items: PromoItem[] }) {
         ))}
       </div>
 
-      {/* Dot indicators */}
       <div className="flex justify-center gap-2 mt-5">
         {items.map((_, i) => (
           <button
@@ -212,20 +209,33 @@ function PromoCarouselMobile({ items }: { items: PromoItem[] }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function PromotionsPage({ params }: { params: Promise<{ lang: Locale }> }) {
   const { lang } = use(params);
-  const t = LANG[lang].promoPage;
   const router = useRouter();
   const pathname = usePathname();
-  const items = t.items as unknown as PromoItem[];
-  const count = items.length;
+  const site = useSiteSettings(lang);
+
+  const [t, setT] = useState<ReturnType<typeof transformPromoPage> | null>(null);
+
+  useEffect(() => {
+    getPromoPageData().then((raw) => {
+      setT(transformPromoPage(raw, lang));
+    });
+  }, [lang]);
 
   const handleLangChange = (newLang: Locale) => {
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
     router.push(newPath);
   };
 
+  if (!t || !site) {
+    return <div className="min-h-screen" style={{ backgroundColor: "#FAF5EE" }} />;
+  }
+
+  const items = t.items;
+  const count = items.length;
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#FAF5EE" }}>
-      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" />
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" t={site.nav} orderUrl={site.orderUrl}/>
 
       {/* ── HERO — desktop only, sits BELOW Navbar ── */}
       <section
@@ -236,7 +246,6 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
           className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center"
           style={{ minHeight: "420px" }}
         >
-          {/* Left: text */}
           <div className="relative z-10 max-w-lg py-16">
             <h1
               className="text-5xl lg:text-6xl leading-tight tracking-tight mb-4"
@@ -250,7 +259,7 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
               {t.heroSubtitle}
             </p>
             <a
-              href="#"
+              href={site.orderUrl}
               className="inline-flex items-center gap-2 text-white font-bold px-7 py-3.5 rounded-full transition-opacity hover:opacity-90 text-sm"
               style={{ backgroundColor: "#6B1111" }}
             >
@@ -258,10 +267,7 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
             </a>
           </div>
 
-          {/* Right: banner image — fills full height, cropped top+bottom (object-cover) */}
-          <div
-            className="absolute right-0 top-0 bottom-0 w-1/2 lg:w-[58%] pointer-events-none select-none overflow-hidden"
-          >
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 lg:w-[58%] pointer-events-none select-none overflow-hidden">
             <img
               src={t.heroBanner}
               alt=""
@@ -272,7 +278,7 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
         </div>
       </section>
 
-      {/* ── MOBILE: Title block (no hero banner) ── */}
+      {/* ── MOBILE: Title block ── */}
       <div className="sm:hidden px-5 pt-25 pb-2">
         <h1 className="text-3xl text-center font-normal leading-tight mb-1" style={{ color: "#1C0A0A" }}>
           {t.heroTitleLine1}
@@ -285,7 +291,6 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
       </div>
 
       {/* ── PROMO CARDS ── */}
-      {/* Desktop layout */}
       <section className="hidden sm:block max-w-7xl mx-auto px-6 lg:px-5 py-14">
         {count === 1 && <PromoCard item={items[0]} />}
 
@@ -300,7 +305,6 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
         {count >= 3 && <PromoCarouselDesktop items={items} />}
       </section>
 
-      {/* Mobile layout — swipe carousel, no padding on sides so cards peek */}
       <section className="sm:hidden py-6 pl-4">
         {count === 1 && (
           <div className="pr-4">
@@ -313,15 +317,16 @@ export default function PromotionsPage({ params }: { params: Promise<{ lang: Loc
       {/* ── CTA bottom ── */}
       <section className="pb-16 flex justify-center px-4">
         <a
-          href="#"
+          href={site.orderUrl}
           className="inline-flex items-center gap-2 text-white font-bold px-14 py-4 rounded-full text-base transition-opacity hover:opacity-90"
           style={{ backgroundColor: "#6B1111" }}
         >
           {t.ctaBtn}
+          <ArrowRight size={14} className="ml-2" />
         </a>
       </section>
 
-      <Footer lang={lang} />
+      <Footer lang={lang} t={site.footer} />
     </div>
   );
 }

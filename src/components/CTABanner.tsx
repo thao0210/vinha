@@ -1,9 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
-export default function CTABanner({ lang }: { lang: Locale }) {
-  const t = LANG[lang].ctaBanner;
+export default function CTABanner({ lang, t }: { lang: Locale; t: any }) {
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [mobileIndex, setMobileIndex] = useState(0);
 

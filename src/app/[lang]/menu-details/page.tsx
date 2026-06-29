@@ -1,184 +1,44 @@
 "use client";
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import { ArrowLeft, Clock, Flame, Star, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { LANG, Locale } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { getMenuItemById } from "@/lib/queryMenuItem";
+import { transformMenuItem } from "@/lib/transformMenuItem";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
-// Khớp id với lang.ts (số 1-12)
-const MENU_DATA = [
-  {
-    id: 1,
-    name: "Cơm Gà Nướng Mật Ong",
-    img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=800&h=800&fit=crop",
-    price: "69.000đ",
-    tag: "hot",
-    category: "mainDish",
-    desc: "Gà ta tươi ướp mật ong nguyên chất qua đêm, nướng than hoa đến vàng ruộm. Vị ngọt tự nhiên của mật ong quyện cùng thịt gà mềm mọng, ăn kèm cơm trắng dẻo và rau sống tươi mát.",
-    calories: "580 kcal",
-    prepTime: "20 phút",
-    rating: 4.9,
-    ingredients: ["Gà ta tươi", "Mật ong nguyên chất", "Cơm trắng", "Rau sống", "Nước chấm đặc biệt"],
-  },
-  {
-    id: 2,
-    name: "Cơm Sườn Nướng BBQ",
-    img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&h=800&fit=crop",
-    price: "75.000đ",
-    tag: "hot",
-    category: "mainDish",
-    desc: "Sườn heo nướng theo phong cách BBQ Mỹ, sốt đặc biệt của Vị Nhà được ướp 12 tiếng. Thịt mềm tan, cháy cạnh thơm lừng, ăn kèm cơm trắng và dưa leo.",
-    calories: "650 kcal",
-    prepTime: "25 phút",
-    rating: 4.8,
-    ingredients: ["Sườn heo", "Sốt BBQ đặc biệt", "Cơm trắng", "Dưa leo", "Hành lá"],
-  },
-  {
-    id: 3,
-    name: "Bún Bò Huế",
-    img: "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&h=800&fit=crop",
-    price: "55.000đ",
-    tag: null,
-    category: "mainDish",
-    desc: "Nước dùng hầm xương bò 8 tiếng, thơm sả và mắm ruốc đúng vị Huế. Bún tươi, thịt bò mềm, chả cua đặc trưng — một tô đậm đà không thể chối từ.",
-    calories: "490 kcal",
-    prepTime: "15 phút",
-    rating: 4.7,
-    ingredients: ["Bún tươi", "Thịt bò", "Chả cua", "Sả", "Mắm ruốc", "Rau sống"],
-  },
-  {
-    id: 4,
-    name: "Phở Bò Tái Chín",
-    img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&h=800&fit=crop",
-    price: "59.000đ",
-    tag: null,
-    category: "mainDish",
-    desc: "Nước phở hầm xương ống và gân bò 10 tiếng, trong vắt và ngọt tự nhiên. Thịt bò tái hồng, chín mềm — chuẩn vị phở Bắc truyền thống giữa lòng Sài Gòn.",
-    calories: "520 kcal",
-    prepTime: "15 phút",
-    rating: 4.8,
-    ingredients: ["Bánh phở", "Thịt bò tái", "Thịt bò chín", "Nước dùng xương", "Hành, ngò", "Tương đen"],
-  },
-  {
-    id: 5,
-    name: "Combo Văn Phòng A",
-    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=800&fit=crop",
-    price: "49.000đ",
-    tag: "hot",
-    category: "combo",
-    desc: "Combo tiết kiệm nhưng đầy đủ dinh dưỡng: 1 món chính + cơm trắng + canh rau + nước uống. Lý tưởng cho bữa trưa nhanh gọn, no bụng, tập trung làm việc buổi chiều.",
-    calories: "620 kcal",
-    prepTime: "10 phút",
-    rating: 4.7,
-    ingredients: ["Món chính theo ngày", "Cơm trắng", "Canh rau", "Nước uống"],
-  },
-  {
-    id: 6,
-    name: "Combo Dinh Dưỡng B",
-    img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=800&fit=crop",
-    price: "65.000đ",
-    tag: "newItem",
-    category: "combo",
-    desc: "Combo cân bằng dinh dưỡng với rau củ đa màu sắc, protein chất lượng cao và tinh bột phức hợp. Được thiết kế bởi chuyên gia dinh dưỡng, phù hợp cho người ăn lành mạnh.",
-    calories: "550 kcal",
-    prepTime: "15 phút",
-    rating: 4.8,
-    ingredients: ["Ức gà áp chảo", "Gạo lứt", "Rau củ hấp", "Salad", "Nước ép trái cây"],
-  },
-  {
-    id: 7,
-    name: "Combo Premium C",
-    img: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=800&fit=crop",
-    price: "89.000đ",
-    tag: "newItem",
-    category: "combo",
-    desc: "Trải nghiệm đỉnh cao với combo cao cấp nhất của Vị Nhà: món chính premium, khai vị, canh đặc biệt, tráng miệng và nước uống cao cấp. Xứng đáng cho một ngày làm việc hiệu quả.",
-    calories: "780 kcal",
-    prepTime: "20 phút",
-    rating: 4.9,
-    ingredients: ["Món chính premium", "Khai vị", "Canh đặc biệt", "Tráng miệng", "Nước cao cấp"],
-  },
-  {
-    id: 8,
-    name: "Trà Chanh Sả",
-    img: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&h=800&fit=crop",
-    price: "25.000đ",
-    tag: null,
-    category: "drinks",
-    desc: "Trà xanh pha lạnh kết hợp chanh tươi và sả thơm, thanh mát và tỉnh táo. Thức uống hoàn hảo cho buổi trưa oi bức tại văn phòng.",
-    calories: "80 kcal",
-    prepTime: "5 phút",
-    rating: 4.6,
-    ingredients: ["Trà xanh", "Chanh tươi", "Sả", "Đường phèn", "Đá"],
-  },
-  {
-    id: 9,
-    name: "Nước Ép Cam Tươi",
-    img: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=800&h=800&fit=crop",
-    price: "30.000đ",
-    tag: "hot",
-    category: "drinks",
-    desc: "100% cam vắt tươi ngay lúc đặt hàng, không thêm đường hay chất bảo quản. Giàu vitamin C, giúp tăng đề kháng và tỉnh táo cả buổi chiều.",
-    calories: "110 kcal",
-    prepTime: "5 phút",
-    rating: 4.8,
-    ingredients: ["Cam tươi 100%", "Không đường", "Không chất bảo quản"],
-  },
-  {
-    id: 10,
-    name: "Sinh Tố Bơ",
-    img: "https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800&h=800&fit=crop",
-    price: "35.000đ",
-    tag: null,
-    category: "drinks",
-    desc: "Bơ sáp Đắk Lắk chín mịn xay cùng sữa tươi và đường vừa miệng. Béo ngậy, thơm lừng, đủ năng lượng để chinh phục deadline buổi chiều.",
-    calories: "280 kcal",
-    prepTime: "5 phút",
-    rating: 4.7,
-    ingredients: ["Bơ sáp Đắk Lắk", "Sữa tươi", "Đường", "Đá xay"],
-  },
-  {
-    id: 11,
-    name: "Gỏi Cuốn Tôm Thịt",
-    img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&h=800&fit=crop",
-    price: "35.000đ",
-    tag: "newItem",
-    category: "sides",
-    desc: "Bánh tráng cuốn tôm sú, thịt heo luộc, bún, rau sống và cà rốt bào sợi. Chấm cùng tương đậu phộng đặc trưng — nhẹ bụng, thanh mát, ăn hoài không ngán.",
-    calories: "180 kcal",
-    prepTime: "10 phút",
-    rating: 4.6,
-    ingredients: ["Bánh tráng", "Tôm sú", "Thịt heo luộc", "Bún", "Rau sống", "Tương đậu phộng"],
-  },
-  {
-    id: 12,
-    name: "Chả Giò Giòn",
-    img: "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?w=800&h=800&fit=crop",
-    price: "28.000đ",
-    tag: null,
-    category: "sides",
-    desc: "Chả giò nhân thịt heo, cà rốt, miến và nấm mèo, chiên giòn rụm vàng ươm. Ăn kèm rau sống và nước mắm chua ngọt — món ăn thêm không thể thiếu.",
-    calories: "220 kcal",
-    prepTime: "10 phút",
-    rating: 4.5,
-    ingredients: ["Thịt heo xay", "Cà rốt", "Miến", "Nấm mèo", "Bánh tráng cuốn", "Nước mắm chua ngọt"],
-  },
-];
+// Nhãn tĩnh theo ngôn ngữ (giữ nguyên như code cũ, không liên quan Sanity)
+const LABELS = {
+  vi: {hot: "Bán chạy", newItem: "Mới"},
+  en: {hot: "Best seller", newItem: "New"},
+};
 
 function MenuDetailContent({ lang }: { lang: Locale }) {
-  const t = LANG[lang].menuPage;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const site = useSiteSettings(lang);
 
   const slugParam = searchParams.get("slug");
   const id = slugParam ? parseInt(slugParam) : null;
-  const item = MENU_DATA.find((m) => m.id === id);
 
-  // Tìm tên từ lang.ts để hỗ trợ đa ngôn ngữ
-  const langItem = t.items.find((i) => i.id === id);
+  const [item, setItem] = useState<ReturnType<typeof transformMenuItem> | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    getMenuItemById(id).then((raw) => {
+      setItem(transformMenuItem(raw, lang));
+      setLoading(false);
+    });
+  }, [id, lang]);
 
   const handleLangChange = (newLang: Locale) => {
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
@@ -190,13 +50,17 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
     newItem: "bg-amber-400 text-white",
   };
   const tagLabel: Record<string, string> = {
-    hot:     t.hot,
-    newItem: t.newItem,
+    hot:     LABELS[lang].hot,
+    newItem: LABELS[lang].newItem,
   };
+
+  if (!site) {
+    return <div className="min-h-screen bg-orange-50" />;
+  }
 
   return (
     <div className="min-h-screen bg-orange-50">
-      <Navbar lang={lang} onLangChange={handleLangChange}  variant="light"/>
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" t={site.nav} orderUrl={site.orderUrl} />
 
       <div className="max-w-5xl mx-auto px-6 lg:px-10 pt-32 pb-24">
         {/* Back */}
@@ -208,8 +72,13 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
           {lang === "vi" ? "Quay lại menu" : "Back to menu"}
         </button>
 
-        {/* Not found */}
-        {!item ? (
+        {/* Loading */}
+        {loading ? (
+          <div className="flex justify-center py-32 text-gray-400">
+            {lang === "vi" ? "Đang tải..." : "Loading..."}
+          </div>
+        ) : !item ? (
+          /* Not found */
           <div className="flex flex-col items-center justify-center py-32 text-center gap-4">
             <p className="text-2xl font-bold text-gray-500">
               {lang === "vi" ? "Không tìm thấy món ăn" : "Dish not found"}
@@ -225,7 +94,7 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
               <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl shadow-black/60">
                 <img
                   src={item.img}
-                  alt={langItem?.name ?? item.name}
+                  alt={item.name}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
@@ -244,7 +113,7 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
               {/* Title + rating */}
               <div>
                 <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-800 leading-tight mb-3">
-                  {langItem?.name ?? item.name}
+                  {item.name}
                 </h1>
                 <div className="flex items-center gap-1.5">
                   {[...Array(5)].map((_, i) => (
@@ -264,7 +133,7 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
 
               {/* Price */}
               <p className="text-4xl font-extrabold text-orange-400">
-                {langItem?.price ?? item.price}
+                {item.price}
               </p>
 
               {/* Stats */}
@@ -303,7 +172,7 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
                   {lang === "vi" ? "Thành phần" : "Ingredients"}
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {item.ingredients.map((ing, i) => (
+                  {item.ingredients.map((ing: string, i: number) => (
                     <span
                       key={i}
                       className="text-sm bg-orange-100 text-gray-700 px-3 py-1.5 rounded-full border border-orange-300"
@@ -327,7 +196,7 @@ function MenuDetailContent({ lang }: { lang: Locale }) {
         )}
       </div>
 
-      <Footer lang={lang} />
+      <Footer lang={lang} t={site.footer} />
     </div>
   );
 }

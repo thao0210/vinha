@@ -1,11 +1,9 @@
 "use client";
 import { ArrowRight, Phone } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Locale, LANG } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
-export default function Hero({ lang }: { lang: Locale }) {
-  const t = LANG[lang].hero;
-
+export default function Hero({ lang, t }: { lang: Locale; t: any }) {
   const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -93,7 +91,8 @@ export default function Hero({ lang }: { lang: Locale }) {
               </p>
 
               {/* CTA */}
-              <button
+              <a
+                href={`/${lang}/menu`}
                 className="inline-flex items-center gap-2.5 font-bold text-[15px] px-8 py-4 rounded-full text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
                 style={{
                   background: "linear-gradient(135deg, var(--color-heading) 0%, #5a0f13 100%)",
@@ -102,7 +101,7 @@ export default function Hero({ lang }: { lang: Locale }) {
               >
                 {t.cta}
                 <ArrowRight size={16} />
-              </button>
+              </a>
             </div>
           </div>
         </div>

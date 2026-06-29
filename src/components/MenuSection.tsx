@@ -1,10 +1,9 @@
 "use client";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState } from "react";
-import { Locale, LANG } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 
-export default function MenuSection({ lang }: { lang: Locale }) {
-  const t = LANG[lang].menu;
+export default function MenuSection({ lang, t, orderUrl }: { lang: Locale; t: any, orderUrl: string }) {
   const desktopScrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [mobileIndex, setMobileIndex] = useState(0);
@@ -76,7 +75,8 @@ export default function MenuSection({ lang }: { lang: Locale }) {
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {t.items.map((item, i) => (
-              <div
+              <a
+                href={orderUrl}
                 key={i}
                 className="flex-none flex flex-col items-center group cursor-pointer"
                 style={{ width: "calc((100% - 64px) / 3)" }}
@@ -110,7 +110,7 @@ export default function MenuSection({ lang }: { lang: Locale }) {
                 >
                   {item.price}
                 </p>
-              </div>
+              </a>
             ))}
           </div>
 

@@ -1,10 +1,13 @@
 "use client";
-import { use, useState, useCallback, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { use, useState, useCallback, useRef, useEffect } from "react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Locale, LANG } from "@/lib/lang";
+import { Locale } from "@/lib/lang";
 import { useRouter, usePathname } from "next/navigation";
+import { getAboutPageData } from "@/lib/queryAboutPage";
+import { transformAboutPage } from "@/lib/transformAboutPage";
+import { useSiteSettings } from "@/lib/useSiteSettings";
 
 // ─── Gallery carousel ─────────────────────────────────────────────────────────
 function GalleryCarousel({ images }: { images: { img: string }[] }) {
@@ -46,27 +49,39 @@ function GalleryCarousel({ images }: { images: { img: string }[] }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function GioiThieuPage({ params }: { params: Promise<{ lang: Locale }> }) {
   const { lang } = use(params);
-  const t = LANG[lang].aboutPage;
+  const site = useSiteSettings(lang);
+  const [t, setT] = useState<ReturnType<typeof transformAboutPage> | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const mobileCarouselRef = useRef<HTMLDivElement>(null);
   const [mobileScrollIdx, setMobileScrollIdx] = useState(0);
 
   const [galleryOffset, setGalleryOffset] = useState(0);
-  const galleryMax = t.gallery.length - 3;
-  const prevGallery = () => setGalleryOffset((o) => Math.max(0, o - 1));
-  const nextGallery = () => setGalleryOffset((o) => Math.min(galleryMax, o + 1));
+
+  useEffect(() => {
+    getAboutPageData().then((raw) => {
+      setT(transformAboutPage(raw, lang));
+    });
+  }, [lang]);
 
   const handleLangChange = (newLang: Locale) => {
     const newPath = pathname.replace(`/${lang}`, `/${newLang}`);
     router.push(newPath);
   };
 
+  if (!t || !site) {
+    return <div className="min-h-screen bg-white" />;
+  }
+
+  const galleryMax = t.gallery.length - 3;
+  const prevGallery = () => setGalleryOffset((o) => Math.max(0, o - 1));
+  const nextGallery = () => setGalleryOffset((o) => Math.min(galleryMax, o + 1));
+
   const heights = ["h-64", "h-80", "h-56", "h-72", "h-60"];
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" />
+      <Navbar lang={lang} onLangChange={handleLangChange} variant="light" t={site.nav} orderUrl={site.orderUrl} />
 
       {/* ════════════════════════════════════════════════════════
           SECTION 1 — HERO (nền trắng, 3 cột desktop)
@@ -396,7 +411,7 @@ export default function GioiThieuPage({ params }: { params: Promise<{ lang: Loca
           {t.gallerySubtitle}
         </p>
 
-        <a href="#" className="text-md font-bold" style={{ color: "#8B1A1A" }}>
+        <a href={site.orderUrl} className="text-md font-bold" style={{ color: "#8B1A1A" }}>
           {t.galleryLink} →
         </a>
       </div>
@@ -527,16 +542,17 @@ export default function GioiThieuPage({ params }: { params: Promise<{ lang: Loca
             </p>
           </div>
           <a
-            href="#"
+            href={site.orderUrl}
             className="shrink-0 inline-flex items-center gap-2 font-bold text-md px-30 lg:px-20 py-4 rounded-full border-1 transition-colors hover:bg-white/20"
             style={{ borderColor: "#820015", color: "#820015", backgroundColor: "rgba(255,255,255,0.6)" }}
           >
             {t.ctaBtn}
+            <ArrowRight size={14} className="ml-2" />
           </a>
         </div>
       </section>
 
-      <Footer lang={lang} />
+      <Footer lang={lang} t={site.footer} />
     </div>
   );
 }
