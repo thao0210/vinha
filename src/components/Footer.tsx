@@ -1,6 +1,11 @@
 "use client";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 import { Locale } from "@/lib/lang";
+import { useState } from "react";
+import dynamic from "next/dynamic";
+
+// Lazy load PolicyModal để không ảnh hưởng bundle size
+const PolicyModal = dynamic(() => import("./PolicyModal"), { ssr: false });
 
 function SocialIcon({ type }: { type: string }) {
   if (type === "facebook")  return <FaFacebookF size={18} />;
@@ -10,8 +15,38 @@ function SocialIcon({ type }: { type: string }) {
 }
 
 export default function Footer({ lang, t }: { lang: Locale; t: any }) {
+  const [policyOpen, setPolicyOpen] = useState(false);
+
+  // Helper render link: href="#" → mở modal thay vì điều hướng
+  const renderLink = (label: string, href: string) => {
+    if (href === "#") {
+      return (
+        <button
+          key={label}
+          onClick={() => setPolicyOpen(true)}
+          className="block text-left text-sm font-medium opacity-80 hover:opacity-100 transition-opacity"
+          style={{ fontFamily: "'Archivo', sans-serif" }}
+        >
+          {label}
+        </button>
+      );
+    }
+    return (
+      <a
+        key={label}
+        href={href}
+        className="block text-sm font-medium opacity-80 hover:opacity-100 transition-opacity"
+        style={{ fontFamily: "'Archivo', sans-serif" }}
+      >
+        {label}
+      </a>
+    );
+  };
+
   return (
-    <footer className="text-white pt-16 pb-12" style={{ backgroundColor: "#7F1D1D" }}>
+    <>
+      <PolicyModal lang={lang} isOpen={policyOpen} onClose={() => setPolicyOpen(false)} />
+      <footer className="text-white pt-16 pb-12" style={{ backgroundColor: "#7F1D1D" }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
         {/* ── Desktop: 3-column grid ── */}
@@ -50,20 +85,9 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
                 {t.exploreTitle}
               </p>
               <div className="flex flex-col gap-2.5">
-                {t.exploreLinks.map(({ label, href }:{label:string; href:string}) => (
-                  <a
-                    key={label}
-                    href={href}
-                    className="underline underline-offset-4 w-fit transition-opacity hover:opacity-70"
-                    style={{
-                      fontFamily: "'Archivo', sans-serif",
-                      fontSize: "1.1rem",
-                      color: "rgba(255,255,255,0.85)",
-                    }}
-                  >
-                    {label}
-                  </a>
-                ))}
+                {t.exploreLinks.map(({ label, href }: {label: string; href: string}) =>
+                  renderLink(label, href)
+                )}
               </div>
             </div>
 
@@ -80,7 +104,7 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
                 {t.followTitle}
               </p>
               <div className="flex items-center gap-3">
-                {t.social.map(({ label, href, type }: { label: string; href: string; type: string }) => (
+                {t.social.map(({ label, href, type }: {label: string; href: string; type:string}) => (
                   <a
                     key={label}
                     href={href}
@@ -175,20 +199,9 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
               {t.exploreTitle}
             </p>
             <div className="flex flex-wrap gap-x-5 gap-y-2">
-              {t.exploreLinks.map(({ label, href }: {label: string; href: string}) => (
-                <a
-                  key={label}
-                  href={href}
-                  className="underline underline-offset-4 transition-opacity hover:opacity-70"
-                  style={{
-                    fontFamily: "'Archivo', sans-serif",
-                    fontSize: "1rem",
-                    color: "rgba(255,255,255,0.85)",
-                  }}
-                >
-                  {label}
-                </a>
-              ))}
+              {t.exploreLinks.map(({ label, href }: {label: string; href: string}) =>
+                renderLink(label, href)
+              )}
             </div>
           </div>
 
@@ -206,7 +219,7 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
               {t.followTitle}
             </p>
             <div className="flex items-center gap-4">
-              {t.social.map(({ label, href, type }:{label:string; href:string; type:string}) => (
+              {t.social.map(({ label, href, type }: {label: string; href: string, type: string}) => (
                 <a
                   key={label}
                   href={href}
@@ -268,5 +281,6 @@ export default function Footer({ lang, t }: { lang: Locale; t: any }) {
         </div>
       </div>
     </footer>
+    </>
   );
 }
